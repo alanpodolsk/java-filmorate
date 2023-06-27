@@ -35,12 +35,12 @@ public class UserController {
 
     @PutMapping
     public User updateUser(@RequestBody User user) {
-            isValid(user);
-            if (user.getId() == null || users.get(user.getId()) == null) {
-                throw new RuntimeException("Данный пользователь отсутствует в базе");
-            }
-            users.put(user.getId(), user);
-            return user;
+        isValid(user);
+        if (user.getId() == null || users.get(user.getId()) == null) {
+            throw new RuntimeException("Данный пользователь отсутствует в базе");
+        }
+        users.put(user.getId(), user);
+        return user;
     }
 
     private void isValid(User user) {

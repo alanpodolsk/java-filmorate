@@ -28,6 +28,7 @@ class FilmControllerTest {
         //Assert
         assertNotNull(createdFilm.getId(), "Объект не был добавлен");
     }
+
     @Test
     @DisplayName("Должна быть выдана ошибка отсутствия фильма")
     void shouldThrownRuntimeExceptionWhenFilmIsNull() {
@@ -72,7 +73,7 @@ class FilmControllerTest {
         //Act
         ValidationException ex = Assertions.assertThrows(
                 ValidationException.class,
-                () -> filmController.createFilm(new Film(null, "Очень длинный фильм",  "description", LocalDate.of(1895, 12, 27), 50))
+                () -> filmController.createFilm(new Film(null, "Очень длинный фильм", "description", LocalDate.of(1895, 12, 27), 50))
         );
         //Assert
         Assertions.assertEquals("Дата создания фильма не может быть ранее 28.12.1895", ex.getMessage());
@@ -84,7 +85,7 @@ class FilmControllerTest {
         //Act
         ValidationException ex = Assertions.assertThrows(
                 ValidationException.class,
-                () -> filmController.createFilm(new Film(null, "Очень длинный фильм",  "description", LocalDate.of(1895, 12, 28), -1))
+                () -> filmController.createFilm(new Film(null, "Очень длинный фильм", "description", LocalDate.of(1895, 12, 28), -1))
         );
         //Assert
         Assertions.assertEquals("Фильм должен иметь положительную продолжительность", ex.getMessage());
