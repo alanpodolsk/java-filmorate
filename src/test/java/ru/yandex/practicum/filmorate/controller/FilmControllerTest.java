@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.ValidationException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
@@ -31,7 +31,7 @@ class FilmControllerTest {
 
     @Test
     @DisplayName("Должна быть выдана ошибка отсутствия фильма")
-    void shouldThrownRuntimeExceptionWhenFilmIsNull() {
+    void shouldThrownValidationExceptionWhenFilmIsNull() {
         //Act
         ValidationException ex = Assertions.assertThrows(
                 ValidationException.class,
@@ -43,7 +43,7 @@ class FilmControllerTest {
 
     @Test
     @DisplayName("Должна быть выдана ошибка отсутствия фильма")
-    void shouldThrownRuntimeExceptionWhenNameIsBlank() {
+    void shouldThrownValidationExceptionWhenNameIsBlank() {
         //Act
         ValidationException ex = Assertions.assertThrows(
                 ValidationException.class,
@@ -55,7 +55,7 @@ class FilmControllerTest {
 
     @Test
     @DisplayName("Должна быть выдана ошибка отсутствия фильма")
-    void shouldThrownRuntimeExceptionWhenDescriptionIsTooLong() {
+    void shouldThrownValidationExceptionWhenDescriptionIsTooLong() {
         //Arrange
         String description = "Очень длинное описание какого-то очень старого фильма с длинным началом и очень нудным концом. Смотреть не советую, очень нудно и скучно очень долго и так далее и тому подобное 1234556789012345567788900000000";
         //Act
@@ -69,7 +69,7 @@ class FilmControllerTest {
 
     @Test
     @DisplayName("Должна быть выдана ошибка слишком раннего релиза")
-    void shouldThrownRuntimeExceptionWhenReleaseDateTooEarly() {
+    void shouldThrownValidationExceptionWhenReleaseDateTooEarly() {
         //Act
         ValidationException ex = Assertions.assertThrows(
                 ValidationException.class,
@@ -81,7 +81,7 @@ class FilmControllerTest {
 
     @Test
     @DisplayName("Должна быть выдана ошибка отрицательной продолжительности фильма")
-    void shouldThrownRuntimeExceptionWhenDurationIsNegative() {
+    void shouldThrownValidationExceptionWhenDurationIsNegative() {
         //Act
         ValidationException ex = Assertions.assertThrows(
                 ValidationException.class,
@@ -125,7 +125,7 @@ class FilmControllerTest {
 
     @Test
     @DisplayName("Должна быть выдана ошибка отсутствия фильма")
-    void shouldThrownRuntimeExceptionWhenIdIsIncorrect() {
+    void shouldThrownNoObjectExceptionWhenIdIsIncorrect() {
         //Act
         RuntimeException ex = Assertions.assertThrows(
                 RuntimeException.class,

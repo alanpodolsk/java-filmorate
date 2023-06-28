@@ -4,7 +4,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.ValidationException;
+import ru.yandex.practicum.filmorate.exception.NoObjectException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
@@ -62,7 +63,7 @@ class UserControllerTest {
                 () -> userController.createUser(new User(null, "alanpo@ya.ru", "", "alan", LocalDate.of(2000, 1, 1)))
         );
         //Assert
-        Assertions.assertEquals("Логин не должен быть пустым", ex.getMessage());
+        Assertions.assertEquals("Логин не должен быть пустым или содержать пробелы", ex.getMessage());
     }
 
     @Test
@@ -113,10 +114,10 @@ class UserControllerTest {
 
     @Test
     @DisplayName("Должна быть выдана отсутствия пользователя")
-    void shouldThrownRuntimeExceptionWhenIdIsIncorrect() {
+    void shouldThrownNoObjectExceptionWhenIdIsIncorrect() {
         //Act
-        RuntimeException ex = Assertions.assertThrows(
-                RuntimeException.class,
+        NoObjectException ex = Assertions.assertThrows(
+                NoObjectException.class,
                 () -> userController.updateUser(new User(null, "alanpo@ya.ru", "alanpo", "alan", LocalDate.of(2020, 1, 1)))
         );
         //Assert

@@ -1,7 +1,8 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.ValidationException;
+import ru.yandex.practicum.filmorate.exception.NoObjectException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
@@ -19,11 +20,8 @@ public class UserController {
 
     @PostMapping
     public User createUser(@RequestBody User user) {
-        isValid(user);
+        user = isValid(user);
         user.setId(generatedId++);
-        if (user.getName() == null) {
-            user.setName(user.getLogin());
-        }
         users.put(user.getId(), user);
         return user;
     }
@@ -35,23 +33,27 @@ public class UserController {
 
     @PutMapping
     public User updateUser(@RequestBody User user) {
-        isValid(user);
+        user = isValid(user);
         if (user.getId() == null || users.get(user.getId()) == null) {
-            throw new RuntimeException("Данный пользователь отсутствует в базе");
+            throw new NoObjectException("Данный пользователь отсутствует в базе");
         }
         users.put(user.getId(), user);
         return user;
     }
 
-    private void isValid(User user) {
+    private User isValid(User user) {
         if (user == null) {
             throw new ValidationException("Передан пустой объект пользователя");
-        } else if (user.getLogin() == null || user.getLogin().isBlank()) {
-            throw new ValidationException("Логин не должен быть пустым");
+        } else if (user.getLogin() == null || user.getLogin().isBlank() || user.getLogin().contains(" ")) {
+            throw new ValidationException("Логин не должен быть пустым или содержать пробелы");
         } else if (user.getBirthday().isAfter(LocalDate.now())) {
             throw new ValidationException("Дата рождения не должна быть позднее сегодня");
-        } else if (user.getEmail().contains("@") == false) {
+        } else if (!user.getEmail().contains("@")) {
             throw new ValidationException("Некорректно указан email");
         }
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setNameLikeLogin();
+        }
+        return user;
     }
 }

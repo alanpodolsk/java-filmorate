@@ -2,7 +2,8 @@ package ru.yandex.practicum.filmorate.controller;
 
 
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.ValidationException;
+import ru.yandex.practicum.filmorate.exception.NoObjectException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
@@ -35,7 +36,7 @@ public class FilmController {
     public Film updateFilm(@RequestBody Film film) {
         isValid(film);
         if (film.getId() == null || films.get(film.getId()) == null) {
-            throw new RuntimeException("Данный фильм отсутствует в базе");
+            throw new NoObjectException("Данный фильм отсутствует в базе");
         }
         films.put(film.getId(), film);
         return film;
@@ -50,7 +51,7 @@ public class FilmController {
             throw new ValidationException("Описание не должно превышать 200 символов");
         } else if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
             throw new ValidationException("Дата создания фильма не может быть ранее 28.12.1895");
-        } else if (film.getDuration() < 0) {
+        } else if (film.getDuration() <= 0) {
             throw new ValidationException("Фильм должен иметь положительную продолжительность");
         }
     }

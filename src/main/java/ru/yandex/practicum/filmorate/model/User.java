@@ -14,4 +14,11 @@ public class User {
     String login;
     String name;
     LocalDate birthday;
+
+    public void setNameLikeLogin() {
+        this.name = this.login;
+    }
 }
+
+
+
