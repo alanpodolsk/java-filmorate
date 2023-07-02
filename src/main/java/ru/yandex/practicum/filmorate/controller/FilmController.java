@@ -1,10 +1,14 @@
 package ru.yandex.practicum.filmorate.controller;
 
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.NoObjectException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -12,19 +16,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 @RestController
 @RequestMapping("/films")
-public class FilmController {
 
-    private final Map<Integer, Film> films = new HashMap<>();
-    private int generatedId = 1;
+public class FilmController {
+    private FilmStorage filmStorage;
+    private FilmService filmService;
+
+    @Autowired
+    public FilmController (FilmStorage filmStorage, FilmService filmService){
+        this.filmStorage = filmStorage;
+        this.filmService = filmService;
+    }
 
     @PostMapping
     public Film createFilm(@RequestBody Film film) {
-        isValid(film);
-        film.setId(generatedId++);
-        films.put(film.getId(), film);
-        return film;
+
     }
 
     @GetMapping
