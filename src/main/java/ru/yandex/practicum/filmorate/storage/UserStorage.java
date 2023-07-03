@@ -8,5 +8,5 @@ public interface UserStorage {
     public User createUser(User user);
     public User updateUser(User user);
     public List<User> getAllUsers();
-    public User getUser();
+    public User getUser(Integer id);
 }

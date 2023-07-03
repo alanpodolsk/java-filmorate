@@ -6,6 +6,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.InMemoryFilmService;
+import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -15,16 +17,19 @@ import static org.junit.jupiter.api.Assertions.*;
 class FilmControllerTest {
     private FilmController filmController;
 
+
+
     @BeforeEach
     void setUp() {
-        filmController = new FilmController();
+
+        filmController = new FilmController(new InMemoryFilmService(new InMemoryFilmStorage()));
     }
 
     @Test
     @DisplayName("Должен добавить фильм")
     void shouldCreateFilm() {
         //Act
-        Film createdFilm = filmController.createFilm(new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50));
+        Film createdFilm = filmController.createFilm(new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50,null));
         //Assert
         assertNotNull(createdFilm.getId(), "Объект не был добавлен");
     }
@@ -47,7 +52,7 @@ class FilmControllerTest {
         //Act
         ValidationException ex = Assertions.assertThrows(
                 ValidationException.class,
-                () -> filmController.createFilm(new Film(null, "", "фильммм", LocalDate.of(2000, 1, 1), 50))
+                () -> filmController.createFilm(new Film(null, "", "фильммм", LocalDate.of(2000, 1, 1), 50,null))
         );
         //Assert
         Assertions.assertEquals("Наименование не должно быть пустым", ex.getMessage());
@@ -61,7 +66,7 @@ class FilmControllerTest {
         //Act
         ValidationException ex = Assertions.assertThrows(
                 ValidationException.class,
-                () -> filmController.createFilm(new Film(null, "Очень длинный фильм", description, LocalDate.of(2000, 1, 1), 50))
+                () -> filmController.createFilm(new Film(null, "Очень длинный фильм", description, LocalDate.of(2000, 1, 1), 50,null))
         );
         //Assert
         Assertions.assertEquals("Описание не должно превышать 200 символов", ex.getMessage());
@@ -73,7 +78,7 @@ class FilmControllerTest {
         //Act
         ValidationException ex = Assertions.assertThrows(
                 ValidationException.class,
-                () -> filmController.createFilm(new Film(null, "Очень длинный фильм", "description", LocalDate.of(1895, 12, 27), 50))
+                () -> filmController.createFilm(new Film(null, "Очень длинный фильм", "description", LocalDate.of(1895, 12, 27), 50,null))
         );
         //Assert
         Assertions.assertEquals("Дата создания фильма не может быть ранее 28.12.1895", ex.getMessage());
@@ -85,7 +90,7 @@ class FilmControllerTest {
         //Act
         ValidationException ex = Assertions.assertThrows(
                 ValidationException.class,
-                () -> filmController.createFilm(new Film(null, "Очень длинный фильм", "description", LocalDate.of(1895, 12, 28), -1))
+                () -> filmController.createFilm(new Film(null, "Очень длинный фильм", "description", LocalDate.of(1895, 12, 28), -1,null))
         );
         //Assert
         Assertions.assertEquals("Фильм должен иметь положительную продолжительность", ex.getMessage());
@@ -95,8 +100,8 @@ class FilmControllerTest {
     @DisplayName("Должен вернуть список из 2 фильмов")
     void shouldGet2Films() {
         //Arrange
-        Film createdFilm1 = filmController.createFilm(new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50));
-        Film createdFilm2 = filmController.createFilm(new Film(null, "черное солнце джунглей", "фильммм", LocalDate.of(2001, 1, 1), 50));
+        Film createdFilm1 = filmController.createFilm(new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50,null));
+        Film createdFilm2 = filmController.createFilm(new Film(null, "черное солнце джунглей", "фильммм", LocalDate.of(2001, 1, 1), 50,null));
         //Act
         List<Film> films = filmController.getAllFilms();
         //Assert
@@ -116,9 +121,9 @@ class FilmControllerTest {
     @DisplayName("Должен обновить фильм")
     void shouldUpdateFilm() {
         //Arrange
-        filmController.createFilm(new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50));
+        filmController.createFilm(new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50,null));
         //Act
-        Film updatedFilm = filmController.updateFilm(new Film(1, "синее солнце джунглей upd", "фильммм", LocalDate.of(2002, 1, 1), 55));
+        Film updatedFilm = filmController.updateFilm(new Film(1, "синее солнце джунглей upd", "фильммм", LocalDate.of(2002, 1, 1), 55,null));
         //Assert
         assertArrayEquals(new Film[]{updatedFilm}, filmController.getAllFilms().toArray(), "Возвращен некорректный список фильмов");
     }
@@ -129,7 +134,7 @@ class FilmControllerTest {
         //Act
         RuntimeException ex = Assertions.assertThrows(
                 RuntimeException.class,
-                () -> filmController.updateFilm(new Film(1, "синее солнце джунглей upd", "фильммм", LocalDate.of(2002, 1, 1), 55))
+                () -> filmController.updateFilm(new Film(1, "синее солнце джунглей upd", "фильммм", LocalDate.of(2002, 1, 1), 55,null))
         );
         //Assert
         Assertions.assertEquals("Данный фильм отсутствует в базе", ex.getMessage());

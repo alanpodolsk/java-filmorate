@@ -12,4 +12,5 @@ public interface UserService {
     public User deleteFriend(Integer userId, Integer friendId);
     public List<User> getFriends(Integer userId);
     public List<User> getMutualFriends(Integer userId, Integer otherId);
+    public User getUser(Integer id);
 }

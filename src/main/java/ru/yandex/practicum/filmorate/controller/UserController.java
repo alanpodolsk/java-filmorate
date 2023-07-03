@@ -1,59 +1,51 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.NoObjectException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
+import ru.yandex.practicum.filmorate.service.UserService;
 import java.util.List;
-import java.util.Map;
+
 
 @RestController
 @RequestMapping("/users")
+@AllArgsConstructor
 public class UserController {
-
-    private final Map<Integer, User> users = new HashMap<>();
-    private int generatedId = 1;
+    private UserService userService;
 
     @PostMapping
     public User createUser(@RequestBody User user) {
-        user = isValid(user);
-        user.setId(generatedId++);
-        users.put(user.getId(), user);
-        return user;
+        return userService.addUser(user);
     }
 
     @GetMapping
     public List<User> getAllUsers() {
-        return new ArrayList<>(users.values());
+        return userService.getAllUsers();
     }
 
     @PutMapping
     public User updateUser(@RequestBody User user) {
-        user = isValid(user);
-        if (user.getId() == null || users.get(user.getId()) == null) {
-            throw new NoObjectException("Данный пользователь отсутствует в базе");
-        }
-        users.put(user.getId(), user);
-        return user;
+        return userService.updateUser(user);
+    }
+    @PutMapping("/{id}/friends/{friendId}")
+    public User addFriend(@PathVariable Integer id, @PathVariable Integer friendId){
+        return userService.addFriend(id,friendId);
+    }
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public User deleteFriend(@PathVariable Integer id, @PathVariable Integer friendId){
+        return userService.deleteFriend(id,friendId);
+    }
+    @GetMapping("/{id}/friends")
+    public List<User> getFriends(@PathVariable Integer id){
+        return userService.getFriends(id);
+    }
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public List<User> getMutualFriends(@PathVariable Integer id, @PathVariable Integer otherId){
+        return userService.getMutualFriends(id,otherId);
+    }
+    @GetMapping("/{id}")
+    public User getUser(@PathVariable Integer id){
+        return userService.getUser(id);
     }
 
-    private User isValid(User user) {
-        if (user == null) {
-            throw new ValidationException("Передан пустой объект пользователя");
-        } else if (user.getLogin() == null || user.getLogin().isBlank() || user.getLogin().contains(" ")) {
-            throw new ValidationException("Логин не должен быть пустым или содержать пробелы");
-        } else if (user.getBirthday().isAfter(LocalDate.now())) {
-            throw new ValidationException("Дата рождения не должна быть позднее сегодня");
-        } else if (!user.getEmail().contains("@")) {
-            throw new ValidationException("Некорректно указан email");
-        }
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setNameLikeLogin();
-        }
-        return user;
-    }
 }

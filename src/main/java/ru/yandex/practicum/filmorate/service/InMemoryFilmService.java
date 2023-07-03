@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.AllArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NoObjectException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -8,8 +9,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -25,6 +25,9 @@ public class InMemoryFilmService implements FilmService {
     @Override
     public Film updateFilm (Film film){
         isValid(film);
+        if (film.getId() == null || filmStorage.getFilm(film.getId()) == null) {
+            throw new NoObjectException("Данный фильм отсутствует в базе");
+        }
         return filmStorage.updateFilm(film);
     }
 
@@ -37,6 +40,9 @@ public class InMemoryFilmService implements FilmService {
     public Film addLike(Integer filmId, Integer userId) {
         Film film = filmStorage.getFilm(filmId);
         Set<Integer> likes = film.getLikes();
+        if (likes == null){
+            likes = new HashSet<>();
+            }
         likes.add(userId);
         film.setLikes(likes);
         filmStorage.updateFilm(film);
@@ -47,19 +53,31 @@ public class InMemoryFilmService implements FilmService {
     public Film deleteLike(Integer filmId, Integer userId) {
         Film film = filmStorage.getFilm(filmId);
         Set<Integer> likes = film.getLikes();
-        if (likes.contains(userId)){
+        if (likes == null){
+            throw new NoObjectException("У данного фильма нет лайков");
+        } else if (!likes.contains(userId)) {
+            throw new NoObjectException("Данный пользователь не ставил лайк");
+        } else {
             likes.remove(userId);
             film.setLikes(likes);
             filmStorage.updateFilm(film);
-        } else {
-            throw new NoObjectException("Данный пользователь не ставил лайк");
+            return film;
         }
-        return null;
     }
 
     @Override
     public List<Film> getPopularFilms(Integer count) {
+
         return null;
+    }
+
+    @Override
+    public Film getFilm(Integer id) {
+        if (filmStorage.getFilm(id) != null){
+            return filmStorage.getFilm(id);
+        } else {
+         throw new NoObjectException("Фильм с id="+id+"не найден");
+        }
     }
 
     private void isValid(Film film) {
