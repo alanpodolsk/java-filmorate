@@ -1,7 +1,16 @@
 package ru.yandex.practicum.filmorate.service;
 
-import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.model.Film;
 
-@Service
-public class FilmService {
-}
+import java.util.List;
+
+public interface FilmService {
+    public Film addFilm(Film film);
+    public Film updateFilm(Film film);
+    public List<Film> getAllFilms();
+    public Film addLike(Integer filmId, Integer userId);
+    public Film deleteLike(Integer filmId, Integer userId);
+    public List<Film> getPopularFilms (Integer count);
+    }
+
+
