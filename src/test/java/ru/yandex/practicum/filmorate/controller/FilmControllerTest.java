@@ -6,6 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+
 import ru.yandex.practicum.filmorate.service.InMemoryFilmService;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
@@ -18,11 +19,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class FilmControllerTest {
     private FilmController filmController;
 
-
-
     @BeforeEach
     void setUp() {
-
         filmController = new FilmController(new InMemoryFilmService(new InMemoryFilmStorage()));
     }
 
@@ -140,6 +138,7 @@ class FilmControllerTest {
         //Assert
         Assertions.assertEquals("Данный фильм отсутствует в базе", ex.getMessage());
     }
+
     @Test
     @DisplayName("Должен поставить лайк фильму")
     void shouldAddLikeToFilm() {

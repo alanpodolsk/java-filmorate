@@ -17,12 +17,12 @@ public class UserController {
     @PostMapping
     public User createUser(@RequestBody User user) {
         return userService.addUser(user);
-    }
+}
 
     @GetMapping
     public List<User> getAllUsers() {
         return userService.getAllUsers();
-    }
+}
 
     @PutMapping
     public User updateUser(@RequestBody User user) {
@@ -53,5 +53,4 @@ public class UserController {
     public User getUser(@PathVariable Integer id) {
         return userService.getUser(id);
     }
-
 }
