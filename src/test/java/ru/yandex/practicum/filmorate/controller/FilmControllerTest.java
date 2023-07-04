@@ -149,6 +149,7 @@ class FilmControllerTest {
         //Assert
         assertArrayEquals(new Integer[]{1}, filmController.getFilm(1).getLikes().toArray(), "Лайк не установлен");
     }
+    
     @Test
     @DisplayName("Должен снять лайк с фильма")
     void shouldDeleteLikeFromFilm() {
@@ -161,6 +162,7 @@ class FilmControllerTest {
         //Assert
         assertArrayEquals(new Integer[]{}, filmController.getFilm(1).getLikes().toArray(), "Лайк не удалён");
     }
+    
     @Test
     @DisplayName("Должен вернуть фильмы согласно количеству лайков")
     void shouldReturn2FilmsOrderedByLikesCountDesc() {
@@ -176,6 +178,7 @@ class FilmControllerTest {
         //Assert
         assertArrayEquals(new Film[]{filmController.getFilm(2),filmController.getFilm(1)}, filmController.getPopularFilms(10).toArray(), "Возвращен некорректный список фильмов");
     }
+    
     @Test
     @DisplayName("Добавление лайка - должна быть выдана ошибка отсутствия фильма")
     void shouldThrownNoObjectExceptionInAddLikeWhenFilmIdIsIncorrect() {
@@ -187,6 +190,7 @@ class FilmControllerTest {
         //Assert
         Assertions.assertEquals("Данный фильм отсутствует в базе", ex.getMessage());
     }
+    
     @Test
     @DisplayName("Удаление лайка - должна быть выдана ошибка отсутствия фильма")
     void shouldThrownNoObjectExceptionInDeleteLikeWhenFilmIdIsIncorrect() {
@@ -198,6 +202,7 @@ class FilmControllerTest {
         //Assert
         Assertions.assertEquals("Данный фильм отсутствует в базе", ex.getMessage());
     }
+    
     @Test
     @DisplayName("Удаление лайка - должна быть выдана ошибка отсутствия лайка")
     void shouldThrownNoObjectExceptionInDeleteLikeWhenLikesIsNotExist() {
