@@ -6,8 +6,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.InMemoryFilmService;
+import ru.yandex.practicum.filmorate.service.InMemoryUserService;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -17,12 +21,15 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class FilmControllerTest {
     private FilmController filmController;
+    private UserController userController;
+    private UserStorage userStorage;
 
 
     @BeforeEach
     void setUp() {
-
-        filmController = new FilmController(new InMemoryFilmService(new InMemoryFilmStorage()));
+        userStorage = new InMemoryUserStorage();
+        filmController = new FilmController(new InMemoryFilmService(new InMemoryFilmStorage(), userStorage));
+        userController = new UserController(new InMemoryUserService(userStorage));
     }
 
     @Test
@@ -144,6 +151,7 @@ class FilmControllerTest {
     @DisplayName("Должен поставить лайк фильму")
     void shouldAddLikeToFilm() {
         //Arrange
+        userController.createUser(new User(null, "alanpo@ya.ru", "alanpo", "alan", LocalDate.of(2000, 1, 1), null));
         filmController.createFilm(new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50, null));
         //Act
         filmController.addLike(1, 1);
@@ -155,6 +163,7 @@ class FilmControllerTest {
     @DisplayName("Должен снять лайк с фильма")
     void shouldDeleteLikeFromFilm() {
         //Arrange
+        userController.createUser(new User(null, "alanpo@ya.ru", "alanpo", "alan", LocalDate.of(2000, 1, 1), null));
         filmController.createFilm(new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50, null));
         filmController.addLike(1, 1);
         assertArrayEquals(new Integer[]{1}, filmController.getFilm(1).getLikes().toArray(), "Лайк не установлен");
@@ -168,6 +177,9 @@ class FilmControllerTest {
     @DisplayName("Должен вернуть фильмы согласно количеству лайков")
     void shouldReturn2FilmsOrderedByLikesCountDesc() {
         //Arrange
+        userController.createUser(new User(null, "alanpo@ya.ru", "alanpo", "alan", LocalDate.of(2000, 1, 1), null));
+        userController.createUser(new User(null, "alanpu@ya.ru", "alanpu", "alan", LocalDate.of(2000, 1, 1), null));
+        userController.createUser(new User(null, "alanpg@ya.ru", "alanpg", "alan", LocalDate.of(2000, 1, 1), null));
         filmController.createFilm(new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50, null));
         filmController.createFilm(new Film(null, "черное солнце джунглей", "фильммм", LocalDate.of(2001, 1, 1), 50, null));
         filmController.addLike(2, 1);

@@ -52,14 +52,12 @@ public class InMemoryUserService implements UserService {
             friends = new HashSet<>();
         }
         friends.add(friendId);
-        user.setFriends(friends);
         userStorage.updateUser(user);
         Set<Integer> otherUserFriends = otherUser.getFriends();
         if (otherUserFriends == null) {
             otherUserFriends = new HashSet<>();
         }
         otherUserFriends.add(id);
-        otherUser.setFriends(otherUserFriends);
         userStorage.updateUser(otherUser);
         return user;
     }
@@ -78,11 +76,9 @@ public class InMemoryUserService implements UserService {
             throw new NoObjectException("Данный пользователь не был в друзьях");
         } else {
             friends.remove(friendId);
-            user.setFriends(friends);
             userStorage.updateUser(user);
             Set<Integer> otherUserFriends = otherUser.getFriends();
             otherUserFriends.remove(id);
-            otherUser.setFriends(otherUserFriends);
             userStorage.updateUser(otherUser);
             return user;
         }
@@ -112,8 +108,9 @@ public class InMemoryUserService implements UserService {
 
     @Override
     public User getUser(Integer id) {
-        if (userStorage.getUser(id) != null) {
-            return userStorage.getUser(id);
+        User user = userStorage.getUser(id);
+        if (user != null) {
+            return user;
         } else {
             throw new NoObjectException("Пользователь с id=" + id + " не найден");
         }

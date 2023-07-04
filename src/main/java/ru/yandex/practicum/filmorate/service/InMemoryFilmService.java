@@ -5,7 +5,9 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NoObjectException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -15,6 +17,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class InMemoryFilmService implements FilmService {
     private final FilmStorage filmStorage;
+    private final UserStorage userStorage;
 
     @Override
     public Film addFilm(Film film) {
@@ -39,15 +42,18 @@ public class InMemoryFilmService implements FilmService {
     @Override
     public Film addLike(Integer filmId, Integer userId) {
         Film film = filmStorage.getFilm(filmId);
+        User user = userStorage.getUser(userId);
         if (film == null) {
             throw new NoObjectException("Данный фильм отсутствует в базе");
+        }
+        if (user == null) {
+            throw new NoObjectException("Данный пользователь отсутствует в базе");
         }
         Set<Integer> likes = film.getLikes();
         if (likes == null) {
             likes = new HashSet<>();
         }
         likes.add(userId);
-        film.setLikes(likes);
         filmStorage.updateFilm(film);
         return null;
     }
@@ -65,7 +71,6 @@ public class InMemoryFilmService implements FilmService {
             throw new NoObjectException("Данный пользователь не ставил лайк");
         } else {
             likes.remove(userId);
-            film.setLikes(likes);
             filmStorage.updateFilm(film);
             return film;
         }
@@ -83,8 +88,9 @@ public class InMemoryFilmService implements FilmService {
 
     @Override
     public Film getFilm(Integer id) {
-        if (filmStorage.getFilm(id) != null) {
-            return filmStorage.getFilm(id);
+        Film film = filmStorage.getFilm(id);
+        if (film != null) {
+            return film;
         } else {
             throw new NoObjectException("Фильм с id=" + id + "не найден");
         }
