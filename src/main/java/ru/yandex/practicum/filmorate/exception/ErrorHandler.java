@@ -15,11 +15,13 @@ public class ErrorHandler {
     public Map<String, String> handleNoObjectException(final NoObjectException e) {
         return Map.of("Object not found", e.getMessage());
     }
+
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleValidationException(final ValidationException e) {
         return Map.of("Validation error", e.getMessage());
     }
+
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Map<String, String> handleRuntimeException(final RuntimeException e) {

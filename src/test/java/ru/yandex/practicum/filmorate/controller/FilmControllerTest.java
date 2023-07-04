@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.service.InMemoryFilmService;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -123,7 +124,7 @@ class FilmControllerTest {
         //Arrange
         filmController.createFilm(new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50,null));
         //Act
-        Film updatedFilm = filmController.updateFilm(new Film(1, "синее солнце джунглей upd", "фильммм", LocalDate.of(2002, 1, 1), 55,null));
+        Film updatedFilm = filmController.updateFilm(new Film(1, "синее солнце джунглей upd", "фильммм", LocalDate.of(2002, 1, 1), 55,new HashSet<>()));
         //Assert
         assertArrayEquals(new Film[]{updatedFilm}, filmController.getAllFilms().toArray(), "Возвращен некорректный список фильмов");
     }
@@ -138,5 +139,77 @@ class FilmControllerTest {
         );
         //Assert
         Assertions.assertEquals("Данный фильм отсутствует в базе", ex.getMessage());
+    }
+    @Test
+    @DisplayName("Должен поставить лайк фильму")
+    void shouldAddLikeToFilm() {
+        //Arrange
+        filmController.createFilm(new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50,null));
+        //Act
+        filmController.addLike(1,1);
+        //Assert
+        assertArrayEquals(new Integer[]{1}, filmController.getFilm(1).getLikes().toArray(), "Лайк не установлен");
+    }
+    @Test
+    @DisplayName("Должен снять лайк с фильма")
+    void shouldDeleteLikeFromFilm() {
+        //Arrange
+        filmController.createFilm(new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50,null));
+        filmController.addLike(1,1);
+        assertArrayEquals(new Integer[]{1}, filmController.getFilm(1).getLikes().toArray(), "Лайк не установлен");
+        //Act
+        filmController.deleteLike(1,1);
+        //Assert
+        assertArrayEquals(new Integer[]{}, filmController.getFilm(1).getLikes().toArray(), "Лайк не удалён");
+    }
+    @Test
+    @DisplayName("Должен вернуть фильмы согласно количеству лайков")
+    void shouldReturn2FilmsOrderedByLikesCountDesc() {
+        //Arrange
+        filmController.createFilm(new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50,null));
+        filmController.createFilm(new Film(null, "черное солнце джунглей", "фильммм", LocalDate.of(2001, 1, 1), 50,null));
+        filmController.addLike(2,1);
+        filmController.addLike(2,3);
+        filmController.addLike(1,1);
+        filmController.addLike(1,1);
+        //Act
+        filmController.addLike(1,1);
+        //Assert
+        assertArrayEquals(new Film[]{filmController.getFilm(2),filmController.getFilm(1)}, filmController.getPopularFilms(10).toArray(), "Возвращен некорректный список фильмов");
+    }
+    @Test
+    @DisplayName("Добавление лайка - должна быть выдана ошибка отсутствия фильма")
+    void shouldThrownNoObjectExceptionInAddLikeWhenFilmIdIsIncorrect() {
+        //Act
+        RuntimeException ex = Assertions.assertThrows(
+                RuntimeException.class,
+                () -> filmController.addLike(1,1)
+                );
+        //Assert
+        Assertions.assertEquals("Данный фильм отсутствует в базе", ex.getMessage());
+    }
+    @Test
+    @DisplayName("Удаление лайка - должна быть выдана ошибка отсутствия фильма")
+    void shouldThrownNoObjectExceptionInDeleteLikeWhenFilmIdIsIncorrect() {
+        //Act
+        RuntimeException ex = Assertions.assertThrows(
+                RuntimeException.class,
+                () -> filmController.deleteLike(1,1)
+        );
+        //Assert
+        Assertions.assertEquals("Данный фильм отсутствует в базе", ex.getMessage());
+    }
+    @Test
+    @DisplayName("Удаление лайка - должна быть выдана ошибка отсутствия лайка")
+    void shouldThrownNoObjectExceptionInDeleteLikeWhenLikesIsNotExist() {
+        //Arrange
+        filmController.createFilm(new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50,null));
+        //Act
+        RuntimeException ex = Assertions.assertThrows(
+                RuntimeException.class,
+                () -> filmController.deleteLike(1,1)
+        );
+        //Assert
+        Assertions.assertEquals("Данный пользователь не ставил лайк", ex.getMessage());
     }
 }

@@ -17,13 +17,13 @@ public class InMemoryFilmService implements FilmService {
     private final FilmStorage filmStorage;
 
     @Override
-    public Film addFilm(Film film){
+    public Film addFilm(Film film) {
         isValid(film);
         return filmStorage.addFilm(film);
     }
 
     @Override
-    public Film updateFilm (Film film){
+    public Film updateFilm(Film film) {
         isValid(film);
         if (film.getId() == null || filmStorage.getFilm(film.getId()) == null) {
             throw new NoObjectException("Данный фильм отсутствует в базе");
@@ -32,17 +32,20 @@ public class InMemoryFilmService implements FilmService {
     }
 
     @Override
-    public List<Film> getAllFilms(){
+    public List<Film> getAllFilms() {
         return filmStorage.getAllFilms();
     }
 
     @Override
     public Film addLike(Integer filmId, Integer userId) {
         Film film = filmStorage.getFilm(filmId);
+        if (film == null) {
+            throw new NoObjectException("Данный фильм отсутствует в базе");
+        }
         Set<Integer> likes = film.getLikes();
-        if (likes == null){
+        if (likes == null) {
             likes = new HashSet<>();
-            }
+        }
         likes.add(userId);
         film.setLikes(likes);
         filmStorage.updateFilm(film);
@@ -52,8 +55,11 @@ public class InMemoryFilmService implements FilmService {
     @Override
     public Film deleteLike(Integer filmId, Integer userId) {
         Film film = filmStorage.getFilm(filmId);
+        if (film == null) {
+            throw new NoObjectException("Данный фильм отсутствует в базе");
+        }
         Set<Integer> likes = film.getLikes();
-        if (likes == null){
+        if (likes == null) {
             throw new NoObjectException("У данного фильма нет лайков");
         } else if (!likes.contains(userId)) {
             throw new NoObjectException("Данный пользователь не ставил лайк");
@@ -67,22 +73,20 @@ public class InMemoryFilmService implements FilmService {
 
     @Override
     public List<Film> getPopularFilms(Integer count) {
-    /*    List<Film> films = filmStorage.getAllFilms();
+        List<Film> films = filmStorage.getAllFilms();
         return films.stream().sorted((p0, p1) -> {
-            int comp = p0.getLikes().size().compareTo(p1.getLikes().size());
-            return comp;
-        }
+                    int comp = -1 * Integer.valueOf(p0.getLikes().size()).compareTo(p1.getLikes().size());
+                    return comp;
+                }
         ).limit(count).collect(Collectors.toList());
-        */
-     return null;
     }
 
     @Override
     public Film getFilm(Integer id) {
-        if (filmStorage.getFilm(id) != null){
+        if (filmStorage.getFilm(id) != null) {
             return filmStorage.getFilm(id);
         } else {
-         throw new NoObjectException("Фильм с id="+id+"не найден");
+            throw new NoObjectException("Фильм с id=" + id + "не найден");
         }
     }
 
@@ -98,7 +102,7 @@ public class InMemoryFilmService implements FilmService {
         } else if (film.getDuration() <= 0) {
             throw new ValidationException("Фильм должен иметь положительную продолжительность");
         }
-        if (film.getLikes() == null){
+        if (film.getLikes() == null) {
             film.setLikes(new HashSet<>());
         }
         return film;

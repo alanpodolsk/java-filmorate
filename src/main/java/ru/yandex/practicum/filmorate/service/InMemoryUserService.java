@@ -6,6 +6,7 @@ import ru.yandex.practicum.filmorate.exception.NoObjectException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -14,8 +15,9 @@ import java.util.Set;
 
 @Service
 @AllArgsConstructor
-public class InMemoryUserService implements UserService{
+public class InMemoryUserService implements UserService {
     private final UserStorage userStorage;
+
     @Override
     public User addUser(User user) {
         isValid(user);
@@ -42,18 +44,18 @@ public class InMemoryUserService implements UserService{
         User otherUser = userStorage.getUser(friendId);
         if (otherUser == null)
             throw new NoObjectException("Пользователь с ID =" + friendId + " не найден");
-        else if (user == null){
+        else if (user == null) {
             throw new NoObjectException("Пользователь с ID =" + id + " не найден");
         }
         Set<Integer> friends = user.getFriends();
-        if (friends == null){
+        if (friends == null) {
             friends = new HashSet<>();
         }
         friends.add(friendId);
         user.setFriends(friends);
         userStorage.updateUser(user);
-        Set <Integer> otherUserFriends = otherUser.getFriends();
-        if (otherUserFriends == null){
+        Set<Integer> otherUserFriends = otherUser.getFriends();
+        if (otherUserFriends == null) {
             otherUserFriends = new HashSet<>();
         }
         otherUserFriends.add(id);
@@ -68,7 +70,7 @@ public class InMemoryUserService implements UserService{
         User otherUser = userStorage.getUser(friendId);
         if (otherUser == null)
             throw new NoObjectException("Пользователь с ID =" + friendId + " не найден");
-        else if (user == null){
+        else if (user == null) {
             throw new NoObjectException("Пользователь с ID =" + id + " не найден");
         }
         Set<Integer> friends = user.getFriends();
@@ -78,7 +80,7 @@ public class InMemoryUserService implements UserService{
             friends.remove(friendId);
             user.setFriends(friends);
             userStorage.updateUser(user);
-            Set <Integer> otherUserFriends = otherUser.getFriends();
+            Set<Integer> otherUserFriends = otherUser.getFriends();
             otherUserFriends.remove(id);
             otherUser.setFriends(otherUserFriends);
             userStorage.updateUser(otherUser);
@@ -89,9 +91,12 @@ public class InMemoryUserService implements UserService{
     @Override
     public List<User> getFriends(Integer userId) {
         User user = userStorage.getUser(userId);
+        if (user == null) {
+            throw new NoObjectException("Пользователь с ID =" + userId + " не найден");
+        }
         List<User> friends = new ArrayList<>();
-        if (user.getFriends() != null){
-            for(Integer friend: user.getFriends()){
+        if (user.getFriends() != null) {
+            for (Integer friend : user.getFriends()) {
                 friends.add(userStorage.getUser(friend));
             }
         }
@@ -102,15 +107,15 @@ public class InMemoryUserService implements UserService{
     public List<User> getMutualFriends(Integer userId, Integer otherId) {
         User user = userStorage.getUser(userId);
         User otherUser = userStorage.getUser(otherId);
-        return getMutualFriends(user.getFriends(),otherUser.getFriends());
+        return getMutualFriends(user.getFriends(), otherUser.getFriends());
     }
 
     @Override
     public User getUser(Integer id) {
-        if (userStorage.getUser(id) != null){
+        if (userStorage.getUser(id) != null) {
             return userStorage.getUser(id);
         } else {
-            throw new NoObjectException("Пользователь с id="+id+" не найден");
+            throw new NoObjectException("Пользователь с id=" + id + " не найден");
         }
     }
 
@@ -127,14 +132,17 @@ public class InMemoryUserService implements UserService{
         if (user.getName() == null || user.getName().isBlank()) {
             user.setNameLikeLogin();
         }
+        if (user.getFriends() == null) {
+            user.setFriends(new HashSet<>());
+        }
         return user;
     }
 
-    private List<User> getMutualFriends(Set<Integer> userFriends, Set<Integer> otherUserFriends){
+    private List<User> getMutualFriends(Set<Integer> userFriends, Set<Integer> otherUserFriends) {
         List<User> mutualFriends = new ArrayList<>();
-        if (userFriends != null && otherUserFriends != null){
-            for (Integer friend : userFriends){
-                if (otherUserFriends.contains(friend)){
+        if (userFriends != null && otherUserFriends != null) {
+            for (Integer friend : userFriends) {
+                if (otherUserFriends.contains(friend)) {
                     mutualFriends.add(userStorage.getUser(friend));
                 }
             }
