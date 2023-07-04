@@ -39,9 +39,12 @@ public class InMemoryUserService implements UserService{
     @Override
     public User addFriend(Integer id, Integer friendId) {
         User user = userStorage.getUser(id);
-        User friend = userStorage.getUser(friendId);
-        if (friend == null)
+        User otherUser = userStorage.getUser(friendId);
+        if (otherUser == null)
             throw new NoObjectException("Пользователь с ID =" + friendId + " не найден");
+        else if (user == null){
+            throw new NoObjectException("Пользователь с ID =" + id + " не найден");
+        }
         Set<Integer> friends = user.getFriends();
         if (friends == null){
             friends = new HashSet<>();
@@ -49,27 +52,37 @@ public class InMemoryUserService implements UserService{
         friends.add(friendId);
         user.setFriends(friends);
         userStorage.updateUser(user);
-        friends = friend.getFriends();
-        if (friends == null){
-            friends = new HashSet<>();
+        Set <Integer> otherUserFriends = otherUser.getFriends();
+        if (otherUserFriends == null){
+            otherUserFriends = new HashSet<>();
         }
-        friends.add(id);
-        friend.setFriends(friends);
-        userStorage.updateUser(friend);
+        otherUserFriends.add(id);
+        otherUser.setFriends(otherUserFriends);
+        userStorage.updateUser(otherUser);
         return user;
     }
 
     @Override
     public User deleteFriend(Integer id, Integer friendId) {
         User user = userStorage.getUser(id);
+        User otherUser = userStorage.getUser(friendId);
+        if (otherUser == null)
+            throw new NoObjectException("Пользователь с ID =" + friendId + " не найден");
+        else if (user == null){
+            throw new NoObjectException("Пользователь с ID =" + id + " не найден");
+        }
         Set<Integer> friends = user.getFriends();
-        if (friends.contains(friendId)) {
+        if (!friends.contains(friendId)) {
+            throw new NoObjectException("Данный пользователь не был в друзьях");
+        } else {
             friends.remove(friendId);
             user.setFriends(friends);
             userStorage.updateUser(user);
+            Set <Integer> otherUserFriends = otherUser.getFriends();
+            otherUserFriends.remove(id);
+            otherUser.setFriends(otherUserFriends);
+            userStorage.updateUser(otherUser);
             return user;
-        } else {
-            throw new NoObjectException("Данный пользователь не был в друзьях");
         }
     }
 

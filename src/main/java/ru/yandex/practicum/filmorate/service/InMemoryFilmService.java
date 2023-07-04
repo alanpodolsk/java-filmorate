@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.AllArgsConstructor;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NoObjectException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -10,6 +9,7 @@ import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -67,8 +67,14 @@ public class InMemoryFilmService implements FilmService {
 
     @Override
     public List<Film> getPopularFilms(Integer count) {
-
-        return null;
+    /*    List<Film> films = filmStorage.getAllFilms();
+        return films.stream().sorted((p0, p1) -> {
+            int comp = p0.getLikes().size().compareTo(p1.getLikes().size());
+            return comp;
+        }
+        ).limit(count).collect(Collectors.toList());
+        */
+     return null;
     }
 
     @Override
@@ -80,7 +86,7 @@ public class InMemoryFilmService implements FilmService {
         }
     }
 
-    private void isValid(Film film) {
+    private Film isValid(Film film) {
         if (film == null) {
             throw new ValidationException("Передан пустой объект фильма");
         } else if (film.getName() == null || film.getName().isBlank()) {
@@ -92,5 +98,9 @@ public class InMemoryFilmService implements FilmService {
         } else if (film.getDuration() <= 0) {
             throw new ValidationException("Фильм должен иметь положительную продолжительность");
         }
+        if (film.getLikes() == null){
+            film.setLikes(new HashSet<>());
+        }
+        return film;
     }
 }
