@@ -1,85 +1,77 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NoObjectException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.repository.FilmDao;
+import ru.yandex.practicum.filmorate.repository.UserDao;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
 import java.util.stream.Collectors;
 
-@Service
+@Component
+@Primary
 @AllArgsConstructor
-public class InMemoryFilmService implements FilmService {
-    private final FilmStorage filmStorage;
-    private final UserStorage userStorage;
+public class DbFilmService implements FilmService{
+    private FilmDao filmDao;
+    private UserDao userDao;
 
     @Override
     public Film addFilm(Film film) {
         isValid(film);
-        return filmStorage.addFilm(film);
+        Integer id = filmDao.addFilm(film);
+        return filmDao.getFilmById(id);
     }
 
     @Override
     public Film updateFilm(Film film) {
         isValid(film);
-        if (film.getId() == null || filmStorage.getFilm(film.getId()) == null) {
+        if(filmDao.getFilmById(film.getId()) == null){
             throw new NoObjectException("Данный фильм отсутствует в базе");
+        } else {
+            Integer id = filmDao.updateFilm(film);
+            return filmDao.getFilmById(id);
         }
-        return filmStorage.updateFilm(film);
     }
 
     @Override
     public List<Film> getAllFilms() {
-        return filmStorage.getAllFilms();
+        return filmDao.getAllFilms();
     }
 
     @Override
     public Film addLike(Integer filmId, Integer userId) {
-        Film film = filmStorage.getFilm(filmId);
-        User user = userStorage.getUser(userId);
-        if (film == null) {
+        if(filmDao.getFilmById(filmId) == null){
             throw new NoObjectException("Данный фильм отсутствует в базе");
-        }
-        if (user == null) {
+        } else if (userDao.getUserById(userId) == null){
             throw new NoObjectException("Данный пользователь отсутствует в базе");
+        } else {
+            filmDao.addLike(filmId, userId);
+            return filmDao.getFilmById(filmId);
         }
-        Set<Integer> likes = film.getLikes();
-        if (likes == null) {
-            likes = new HashSet<>();
-        }
-        likes.add(userId);
-        filmStorage.updateFilm(film);
-        return null;
     }
 
     @Override
-    public Film deleteLike(Integer filmId, Integer userId) {
-        Film film = filmStorage.getFilm(filmId);
-        if (film == null) {
-            throw new NoObjectException("Данный фильм отсутствует в базе");
-        }
-        Set<Integer> likes = film.getLikes();
-        if (likes == null) {
-            throw new NoObjectException("У данного фильма нет лайков");
-        } else if (!likes.contains(userId)) {
-            throw new NoObjectException("Данный пользователь не ставил лайк");
-        } else {
-            likes.remove(userId);
-            filmStorage.updateFilm(film);
-            return film;
+    public Film deleteLike(Integer filmId, Integer userId) {{
+            if(filmDao.getFilmById(filmId) == null){
+                throw new NoObjectException("Данный фильм отсутствует в базе");
+            } else if (userDao.getUserById(userId) == null){
+                throw new NoObjectException("Данный пользователь отсутствует в базе");
+            } else {
+                filmDao.deleteLike(filmId, userId);
+                return filmDao.getFilmById(filmId);
+            }
         }
     }
 
     @Override
     public List<Film> getPopularFilms(Integer count) {
-        List<Film> films = filmStorage.getAllFilms();
+        List<Film> films = filmDao.getAllFilms();
         return films.stream().sorted((p0, p1) -> {
                     int comp = -1 * Integer.valueOf(p0.getLikes().size()).compareTo(p1.getLikes().size());
                     return comp;
@@ -89,14 +81,8 @@ public class InMemoryFilmService implements FilmService {
 
     @Override
     public Film getFilm(Integer id) {
-        Film film = filmStorage.getFilm(id);
-        if (film != null) {
-            return film;
-        } else {
-            throw new NoObjectException("Фильм с id=" + id + "не найден");
-        }
+        return filmDao.getFilmById(id);
     }
-
     private Film isValid(Film film) {
         if (film == null) {
             throw new ValidationException("Передан пустой объект фильма");
