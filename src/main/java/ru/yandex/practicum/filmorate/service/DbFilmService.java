@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @Component
 @Primary
 @AllArgsConstructor
-public class DbFilmService implements FilmService{
+public class DbFilmService implements FilmService {
     private FilmDao filmDao;
     private UserDao userDao;
 
@@ -31,7 +31,7 @@ public class DbFilmService implements FilmService{
     @Override
     public Film updateFilm(Film film) {
         isValid(film);
-        if(filmDao.getFilmById(film.getId()) == null){
+        if (filmDao.getFilmById(film.getId()) == null) {
             throw new NoObjectException("Данный фильм отсутствует в базе");
         } else {
             Integer id = filmDao.updateFilm(film);
@@ -46,9 +46,9 @@ public class DbFilmService implements FilmService{
 
     @Override
     public Film addLike(Integer filmId, Integer userId) {
-        if(filmDao.getFilmById(filmId) == null){
+        if (filmDao.getFilmById(filmId) == null) {
             throw new NoObjectException("Данный фильм отсутствует в базе");
-        } else if (userDao.getUserById(userId) == null){
+        } else if (userDao.getUserById(userId) == null) {
             throw new NoObjectException("Данный пользователь отсутствует в базе");
         } else {
             filmDao.addLike(filmId, userId);
@@ -57,15 +57,14 @@ public class DbFilmService implements FilmService{
     }
 
     @Override
-    public Film deleteLike(Integer filmId, Integer userId) {{
-            if(filmDao.getFilmById(filmId) == null){
-                throw new NoObjectException("Данный фильм отсутствует в базе");
-            } else if (userDao.getUserById(userId) == null){
-                throw new NoObjectException("Данный пользователь отсутствует в базе");
-            } else {
-                filmDao.deleteLike(filmId, userId);
-                return filmDao.getFilmById(filmId);
-            }
+    public Film deleteLike(Integer filmId, Integer userId) {
+        if (filmDao.getFilmById(filmId) == null) {
+            throw new NoObjectException("Данный фильм отсутствует в базе");
+        } else if (userDao.getUserById(userId) == null) {
+            throw new NoObjectException("Данный пользователь отсутствует в базе");
+        } else {
+            filmDao.deleteLike(filmId, userId);
+            return filmDao.getFilmById(filmId);
         }
     }
 
@@ -82,12 +81,13 @@ public class DbFilmService implements FilmService{
     @Override
     public Film getFilm(Integer id) {
         Film film = filmDao.getFilmById(id);
-        if (film == null){
-            throw new NoObjectException("Фильм с id = "+id+" не найден в базе");
+        if (film == null) {
+            throw new NoObjectException("Фильм с id = " + id + " не найден в базе");
         } else {
             return film;
         }
     }
+
     private Film isValid(Film film) {
         if (film == null) {
             throw new ValidationException("Передан пустой объект фильма");

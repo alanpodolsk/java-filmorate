@@ -90,8 +90,16 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public List<User> getAllUsers() {
-        return jdbcTemplate.queryForObject("SELECT u.id, u.name, u.email, u.login, u.birthday, f.friend_id " +
-                "from users u left join friends f on u.id = f.user_id", userRowMapper());
+        try {
+            return jdbcTemplate.queryForObject("SELECT u.id, u.name, u.email, u.login, u.birthday, f.friend_id " +
+                    "from users u left join friends f on u.id = f.user_id", userRowMapper());
+        } catch (RuntimeException e) {
+            if (e.getMessage().contains("expected 1, actual 0")) {
+                return new ArrayList<>();
+            } else {
+                throw new RuntimeException(e.getMessage());
+            }
+        }
     }
 
     @Override

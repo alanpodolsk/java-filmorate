@@ -6,7 +6,6 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.MPA;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -16,9 +15,9 @@ public class MPADaoImpl implements MPADao {
 
     @Override
     public MPA getMpaById(Integer id) {
-        try{
+        try {
             return jdbcTemplate.queryForObject("SELECT id, name From mpa_ratings WHERE id = ?", mpaRowMapper(), id);
-        } catch (RuntimeException e){
+        } catch (RuntimeException e) {
             if (e.getMessage().contains("expected 1, actual 0")) {
                 return null;
             } else {

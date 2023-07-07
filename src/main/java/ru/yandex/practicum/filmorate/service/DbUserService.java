@@ -11,11 +11,13 @@ import ru.yandex.practicum.filmorate.repository.UserDao;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
+
 @Service
 @Primary
 @AllArgsConstructor
-public class DbUserService implements UserService{
+public class DbUserService implements UserService {
     private UserDao userDao;
+
     @Override
     public User addUser(User user) {
         isValid(user);
@@ -39,24 +41,24 @@ public class DbUserService implements UserService{
 
     @Override
     public User addFriend(Integer userId, Integer friendId) {
-        if (userDao.getUserById(userId) == null){
+        if (userDao.getUserById(userId) == null) {
             throw new NoObjectException("Пользователь с ID =" + userId + " не найден");
-        } else if (userDao.getUserById(friendId) == null){
+        } else if (userDao.getUserById(friendId) == null) {
             throw new NoObjectException("Пользователь с ID =" + friendId + " не найден");
         } else {
-            userDao.addFriend(userId,friendId);
+            userDao.addFriend(userId, friendId);
             return userDao.getUserById(userId);
         }
     }
 
     @Override
     public User deleteFriend(Integer userId, Integer friendId) {
-        if (userDao.getUserById(userId) == null){
+        if (userDao.getUserById(userId) == null) {
             throw new NoObjectException("Пользователь с ID =" + userId + " не найден");
-        } else if (userDao.getUserById(userId) == null){
+        } else if (userDao.getUserById(userId) == null) {
             throw new NoObjectException("Пользователь с ID =" + friendId + " не найден");
         } else {
-            userDao.deleteFriend(userId,friendId);
+            userDao.deleteFriend(userId, friendId);
             return userDao.getUserById(userId);
         }
     }
@@ -68,18 +70,19 @@ public class DbUserService implements UserService{
 
     @Override
     public List<User> getMutualFriends(Integer userId, Integer otherId) {
-        return userDao.getMutualFriends(userId,otherId);
+        return userDao.getMutualFriends(userId, otherId);
     }
 
     @Override
     public User getUser(Integer id) {
         User user = userDao.getUserById(id);
-        if (user == null){
-            throw new NoObjectException("Пользователь с id = "+id+" отсутствует в базе");
+        if (user == null) {
+            throw new NoObjectException("Пользователь с id = " + id + " отсутствует в базе");
         } else {
             return user;
         }
     }
+
     private User isValid(User user) {
         if (user == null) {
             throw new ValidationException("Передан пустой объект пользователя");

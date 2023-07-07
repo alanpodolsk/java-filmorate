@@ -17,8 +17,8 @@ public class DbMPAService implements MPAService {
     @Override
     public MPA getMPAById(Integer id) {
         MPA mpa = mpaDao.getMpaById(id);
-        if (mpa == null){
-            throw new NoObjectException("Рейтинг с id = "+id+" не найден в базе");
+        if (mpa == null) {
+            throw new NoObjectException("Рейтинг с id = " + id + " не найден в базе");
         } else {
             return mpa;
         }

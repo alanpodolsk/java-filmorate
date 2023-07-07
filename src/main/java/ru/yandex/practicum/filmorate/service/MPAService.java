@@ -6,5 +6,6 @@ import java.util.List;
 
 public interface MPAService {
     public MPA getMPAById(Integer id);
+
     public List<MPA> getAllMPA();
 }

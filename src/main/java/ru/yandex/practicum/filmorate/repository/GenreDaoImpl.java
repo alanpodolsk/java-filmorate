@@ -12,13 +12,14 @@ import java.util.List;
 @Component
 @AllArgsConstructor
 @Primary
-public class GenreDaoImpl implements GenreDao{
+public class GenreDaoImpl implements GenreDao {
     private final JdbcTemplate jdbcTemplate;
+
     @Override
     public Genre getGenreById(Integer id) {
-        try{
+        try {
             return jdbcTemplate.queryForObject("SELECT id, name From genres WHERE id = ?", genreRowMapper(), id);
-        } catch (RuntimeException e){
+        } catch (RuntimeException e) {
             if (e.getMessage().contains("expected 1, actual 0")) {
                 return null;
             } else {
@@ -33,9 +34,9 @@ public class GenreDaoImpl implements GenreDao{
         return jdbcTemplate.query("SELECT id, name From genres ORDER BY id ASC", genreRowMapper());
     }
 
-    public RowMapper<Genre> genreRowMapper(){
+    public RowMapper<Genre> genreRowMapper() {
         return (rs, rowNum) -> {
-            return new Genre(rs.getInt("id"),rs.getString("name"));
+            return new Genre(rs.getInt("id"), rs.getString("name"));
         };
     }
 }

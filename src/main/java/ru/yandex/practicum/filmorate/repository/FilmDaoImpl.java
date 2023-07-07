@@ -33,7 +33,7 @@ public class FilmDaoImpl implements FilmDao {
         if (film.getGenres() != null) {
             for (Genre genre : film.getGenres()) {
                 jdbcTemplate.update(sqlQuery,
-                        (Integer)id,
+                        (Integer) id,
                         genre.getId());
             }
         }
@@ -165,8 +165,6 @@ public class FilmDaoImpl implements FilmDao {
         };
     }
 
-    private Integer getLastFilmId() {
-        return jdbcTemplate.queryForObject("SELECT MAX(id) from films", Integer.class);
-    }
+
 }
 

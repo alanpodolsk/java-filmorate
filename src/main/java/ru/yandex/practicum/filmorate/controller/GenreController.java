@@ -17,11 +17,12 @@ public class GenreController {
     private final GenreService genreService;
 
     @GetMapping
-    public List<Genre> getAllGenres(){
+    public List<Genre> getAllGenres() {
         return genreService.getAllGenres();
     }
+
     @GetMapping("/{id}")
-    public Genre getGenreById(@PathVariable Integer id){
+    public Genre getGenreById(@PathVariable Integer id) {
         return genreService.getGenreById(id);
     }
 
