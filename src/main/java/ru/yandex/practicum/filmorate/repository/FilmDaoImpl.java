@@ -30,10 +30,12 @@ public class FilmDaoImpl implements FilmDao {
         Number id = simpleJdbcInsert.executeAndReturnKey(params);
 
         String sqlQuery = "INSERT INTO films_genres (film_id, genre_id) VALUES (?,?)";
-        for (Genre genre : film.getGenres()) {
-            jdbcTemplate.update(sqlQuery,
-                    id,
-                    genre.getId());
+        if (film.getGenres() != null) {
+            for (Genre genre : film.getGenres()) {
+                jdbcTemplate.update(sqlQuery,
+                        (Integer)id,
+                        genre.getId());
+            }
         }
         return (Integer) id;
     }
@@ -53,10 +55,12 @@ public class FilmDaoImpl implements FilmDao {
         jdbcTemplate.update(sqlQuery, film.getId());
 
         sqlQuery = "INSERT INTO films_genres (film_id, genre_id) VALUES (?,?)";
-        for (Genre genre : film.getGenres()) {
-            jdbcTemplate.update(sqlQuery,
-                    film.getId(),
-                    genre.getId());
+        if (film.getGenres() != null) {
+            for (Genre genre : film.getGenres()) {
+                jdbcTemplate.update(sqlQuery,
+                        film.getId(),
+                        genre.getId());
+            }
         }
         return film.getId();
     }
@@ -104,8 +108,8 @@ public class FilmDaoImpl implements FilmDao {
     public void addLike(Integer filmId, Integer userId) {
         String sqlQuery = "INSERT INTO likes (film_id, user_id) VALUES (?,?)";
         jdbcTemplate.update(sqlQuery,
-                userId,
-                filmId);
+                filmId,
+                userId);
     }
 
     @Override
@@ -147,7 +151,7 @@ public class FilmDaoImpl implements FilmDao {
                 }
                 Integer like = rs.getInt("user_id");
                 if (like > 0) {
-                    likes.add(rs.getInt("friend_id"));
+                    likes.add(rs.getInt("user_id"));
                 }
                 Integer genre = rs.getInt("genre_id");
                 if (genre > 0) {

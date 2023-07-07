@@ -16,13 +16,21 @@ public class GenreDaoImpl implements GenreDao{
     private final JdbcTemplate jdbcTemplate;
     @Override
     public Genre getGenreById(Integer id) {
-        return jdbcTemplate.queryForObject("SELECT id, name From genres WHERE id = ?", genreRowMapper(), id);
+        try{
+            return jdbcTemplate.queryForObject("SELECT id, name From genres WHERE id = ?", genreRowMapper(), id);
+        } catch (RuntimeException e){
+            if (e.getMessage().contains("expected 1, actual 0")) {
+                return null;
+            } else {
+                throw new RuntimeException(e.getMessage());
+            }
+        }
 
     }
 
     @Override
     public List<Genre> getAllGenres() {
-        return jdbcTemplate.query("SELECT id, name From genres", genreRowMapper());
+        return jdbcTemplate.query("SELECT id, name From genres ORDER BY id ASC", genreRowMapper());
     }
 
     public RowMapper<Genre> genreRowMapper(){

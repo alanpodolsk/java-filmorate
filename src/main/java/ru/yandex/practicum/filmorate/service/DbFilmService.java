@@ -81,7 +81,12 @@ public class DbFilmService implements FilmService{
 
     @Override
     public Film getFilm(Integer id) {
-        return filmDao.getFilmById(id);
+        Film film = filmDao.getFilmById(id);
+        if (film == null){
+            throw new NoObjectException("Фильм с id = "+id+" не найден в базе");
+        } else {
+            return film;
+        }
     }
     private Film isValid(Film film) {
         if (film == null) {
