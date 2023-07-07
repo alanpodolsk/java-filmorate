@@ -239,23 +239,26 @@ class FilmorateApplicationTests {
         //Assert
         Assertions.assertNull(genreDao.getGenreById(9999), "Возвращен жанр");
     }
+
     @Test
     @DisplayName("Должен вернуть перечень MPA")
     public void shouldReturnAllMPA() {
         //Assert
-        Assertions.assertEquals(5,mpaDao.getAllMPA().size(), "Возвращен некорректный список MPA");
+        Assertions.assertEquals(5, mpaDao.getAllMPA().size(), "Возвращен некорректный список MPA");
     }
+
     @Test
     @DisplayName("Должен не вернуть ничего - некорректный id MPA")
     public void shouldReturnNullMPA() {
         //Assert
         Assertions.assertNull(mpaDao.getMpaById(9999), "Возвращен рейтинг МРА");
     }
+
     @Test
     @DisplayName("Должен вернуть МРА NC17 (id 5)")
     public void shouldReturnNC17() {
         //Assert
-        Assertions.assertEquals("NC-17",mpaDao.getMpaById(5).getName(), "Возвращен некорректный рейтинг МРА");
+        Assertions.assertEquals("NC-17", mpaDao.getMpaById(5).getName(), "Возвращен некорректный рейтинг МРА");
     }
 
 
