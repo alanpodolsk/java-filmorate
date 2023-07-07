@@ -20,6 +20,7 @@ public class User {
     Set<Integer> friends;
 
 
+
     public void setNameLikeLogin() {
         this.name = this.login;
     }
