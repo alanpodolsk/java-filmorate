@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.repository;
 
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Primary;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
@@ -19,14 +20,9 @@ public class GenreDaoImpl implements GenreDao {
     public Genre getGenreById(Integer id) {
         try {
             return jdbcTemplate.queryForObject("SELECT id, name From genres WHERE id = ?", genreRowMapper(), id);
-        } catch (RuntimeException e) {
-            if (e.getMessage().contains("expected 1, actual 0")) {
-                return null;
-            } else {
-                throw new RuntimeException(e.getMessage());
-            }
+        } catch (EmptyResultDataAccessException e) {
+            return null;
         }
-
     }
 
     @Override

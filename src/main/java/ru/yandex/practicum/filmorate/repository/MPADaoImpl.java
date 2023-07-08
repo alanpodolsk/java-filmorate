@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.repository;
 
 import lombok.AllArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
@@ -17,12 +18,8 @@ public class MPADaoImpl implements MPADao {
     public MPA getMpaById(Integer id) {
         try {
             return jdbcTemplate.queryForObject("SELECT id, name From mpa_ratings WHERE id = ?", mpaRowMapper(), id);
-        } catch (RuntimeException e) {
-            if (e.getMessage().contains("expected 1, actual 0")) {
-                return null;
-            } else {
-                throw new RuntimeException(e.getMessage());
-            }
+        } catch (EmptyResultDataAccessException e) {
+            return null;
         }
     }
 

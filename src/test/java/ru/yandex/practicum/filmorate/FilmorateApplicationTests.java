@@ -42,9 +42,9 @@ class FilmorateApplicationTests {
     @DisplayName("Должен добавить пользователя в базу данных")
     void shouldAddUserInDB() {
         //Act
-        Integer id = userDao.addUser(new User(null, "alanpo@ya.ru", "alanpo", "alan", LocalDate.of(2000, 1, 1), new HashSet<>()));
+        User user = userDao.addUser(new User(null, "alanpo@ya.ru", "alanpo", "alan", LocalDate.of(2000, 1, 1), new HashSet<>()));
         //Assert
-        Assertions.assertEquals(1, id, "Пользователь сформирован с некорректным id");
+        Assertions.assertEquals(1, user.getId(), "Пользователь сформирован с некорректным id");
     }
 
     @Test
@@ -64,8 +64,7 @@ class FilmorateApplicationTests {
         //Arrange
         userDao.addUser(new User(null, "alanpo@ya.ru", "alanpo", "alan", LocalDate.of(2000, 1, 1), new HashSet<>()));
         //Act
-        Integer id = userDao.updateUser(new User(1, "alanpi@ya.ru", "alanpo", "alan", LocalDate.of(2000, 1, 1), new HashSet<>()));
-        User user = userDao.getUserById(id);
+        User user = userDao.updateUser(new User(1, "alanpi@ya.ru", "alanpo", "alan", LocalDate.of(2000, 1, 1), new HashSet<>()));
         //Assert
         Assertions.assertEquals(1, user.getId(), "Возвращен пользователь с некорректным id");
         Assertions.assertEquals("alanpi@ya.ru", user.getEmail(), "Email не обновлен");
@@ -125,16 +124,16 @@ class FilmorateApplicationTests {
     @DisplayName("Должен создать фильм с id 1")
     public void shouldAddFilmId1() {
         //Act
-        Integer id = filmDao.addFilm(new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50, null, null, new MPA(1, null)));
+        Film film = filmDao.addFilm(new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50, null, null, new MPA(1, null)));
         //Assert
-        Assertions.assertEquals(1, id, "Фильм сформирован с некорректным id");
+        Assertions.assertEquals(1, film.getId(), "Фильм сформирован с некорректным id");
     }
 
     @Test
     @DisplayName("Должен вернуть фильм с id 1")
     public void shouldGetFilmId1() {
         //Arrange
-        Integer id = filmDao.addFilm(new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50, null, null, new MPA(1, null)));
+        filmDao.addFilm(new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50, null, null, new MPA(1, null)));
         //Act
         Film film = filmDao.getFilmById(1);
         //Assert
@@ -217,6 +216,20 @@ class FilmorateApplicationTests {
         filmDao.addLike(1, 1);
         //Assert
         assertArrayEquals(new Integer[]{2, 1}, filmDao.getLikes(1).toArray(), "Возвращен некорректный список лайков");
+    }
+
+    @Test
+    @DisplayName("Должен вернуть упорядоченный по популярности список")
+    public void shouldReturnFilmsOrderedByLikes() {
+        //Arrange
+        filmDao.addFilm(new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50, null, null, new MPA(1, null)));
+        filmDao.addFilm(new Film(null, "черное солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50, null, null, new MPA(1, null)));
+        userDao.addUser(new User(null, "alanpo@ya.ru", "alanpo", "alan", LocalDate.of(2000, 1, 1), new HashSet<>()));
+        userDao.addUser(new User(null, "alanpu@ya.ru", "alanpu", "alan", LocalDate.of(2000, 1, 1), new HashSet<>()));
+        filmDao.addLike(1, 2);
+        filmDao.addLike(1, 1);
+        //Assert
+        assertArrayEquals(new Film[]{filmDao.getFilmById(2), filmDao.getFilmById(1)}, filmDao.getPopularFilms(10).toArray(), "Возвращен некорректный список популярных фильмов");
     }
 
     @Test

@@ -12,7 +12,6 @@ import ru.yandex.practicum.filmorate.repository.UserDao;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 @Primary
@@ -24,8 +23,7 @@ public class DbFilmService implements FilmService {
     @Override
     public Film addFilm(Film film) {
         isValid(film);
-        Integer id = filmDao.addFilm(film);
-        return filmDao.getFilmById(id);
+        return filmDao.getFilmById(filmDao.addFilm(film).getId());
     }
 
     @Override
@@ -34,8 +32,8 @@ public class DbFilmService implements FilmService {
         if (filmDao.getFilmById(film.getId()) == null) {
             throw new NoObjectException("Данный фильм отсутствует в базе");
         } else {
-            Integer id = filmDao.updateFilm(film);
-            return filmDao.getFilmById(id);
+            filmDao.updateFilm(film);
+            return filmDao.getFilmById(film.getId());
         }
     }
 
@@ -70,12 +68,7 @@ public class DbFilmService implements FilmService {
 
     @Override
     public List<Film> getPopularFilms(Integer count) {
-        List<Film> films = filmDao.getAllFilms();
-        return films.stream().sorted((p0, p1) -> {
-                    int comp = -1 * Integer.valueOf(p0.getLikes().size()).compareTo(p1.getLikes().size());
-                    return comp;
-                }
-        ).limit(count).collect(Collectors.toList());
+        return filmDao.getPopularFilms(count);
     }
 
     @Override

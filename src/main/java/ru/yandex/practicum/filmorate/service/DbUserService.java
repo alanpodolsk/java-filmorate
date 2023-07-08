@@ -21,7 +21,7 @@ public class DbUserService implements UserService {
     @Override
     public User addUser(User user) {
         isValid(user);
-        return userDao.getUserById(userDao.addUser(user));
+        return userDao.addUser(user);
     }
 
     @Override
@@ -30,8 +30,7 @@ public class DbUserService implements UserService {
         if (user.getId() == null || userDao.getUserById(user.getId()) == null) {
             throw new NoObjectException("Данный пользователь отсутствует в базе");
         }
-        userDao.updateUser(user);
-        return userDao.getUserById(user.getId());
+        return userDao.updateUser(user);
     }
 
     @Override
@@ -65,12 +64,22 @@ public class DbUserService implements UserService {
 
     @Override
     public List<User> getFriends(Integer userId) {
-        return userDao.getFriendsById(userId);
+        if (userDao.getUserById(userId) == null) {
+            throw new NoObjectException("Пользователь с id = " + userId + "отсутствует в базе");
+        } else {
+            return userDao.getFriendsById(userId);
+        }
     }
 
     @Override
     public List<User> getMutualFriends(Integer userId, Integer otherId) {
-        return userDao.getMutualFriends(userId, otherId);
+        if (userDao.getUserById(userId) == null) {
+            throw new NoObjectException("Пользователь с id = " + userId + "отсутствует в базе");
+        } else if (userDao.getUserById(otherId) == null) {
+            throw new NoObjectException("Пользователь с id = " + otherId + "отсутствует в базе");
+        } else {
+            return userDao.getMutualFriends(userId, otherId);
+        }
     }
 
     @Override
