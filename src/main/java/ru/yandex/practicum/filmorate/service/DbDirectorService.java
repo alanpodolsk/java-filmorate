@@ -53,13 +53,11 @@ public class DbDirectorService implements DirectorService {
         directorDao.deleteDirectorById(id);
     }
 
-    private Director isValid(Director director) {
+    private void isValid(Director director) {
         if (director == null) {
             throw new ValidationException("Передан пустой объект режиссера");
         } else if (director.getName() == null || director.getName().isBlank()) {
             throw new ValidationException("Наименование не должно быть пустым");
         }
-
-        return director;
     }
 }
