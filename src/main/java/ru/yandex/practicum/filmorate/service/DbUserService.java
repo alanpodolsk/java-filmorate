@@ -98,9 +98,9 @@ public class DbUserService implements UserService {
         Integer maxLikesCrossing = 0;
         Integer sameUserId = -1;
         Map<Integer,Integer> commonFilms = new HashMap<>();
-        for(Film film : films) {
+        for (Film film : films) {
             if (film.getLikes().contains(id)) {
-                for (Integer usersId: film.getLikes()) {
+                for (Integer usersId : film.getLikes()) {
                     if (commonFilms.containsKey(usersId)) {
                         commonFilms.put(usersId,commonFilms.get(usersId) + 1);
                     }
