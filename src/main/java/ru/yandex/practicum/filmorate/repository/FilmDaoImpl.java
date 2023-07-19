@@ -38,6 +38,16 @@ public class FilmDaoImpl implements FilmDao {
     }
 
     @Override
+    public void deleteFilm(Integer filmId) {
+        String sqlQueryDeleteGenres = "DELETE FROM films_genres WHERE film_id = ?";
+        String sqlQueryDeleteLikes = "DELETE FROM likes WHERE film_id = ?";
+        String sqlQueryDeleteFilm = "DELETE FROM films WHERE id = ?";
+        jdbcTemplate.update(sqlQueryDeleteGenres, filmId);
+        jdbcTemplate.update(sqlQueryDeleteLikes, filmId);
+        jdbcTemplate.update(sqlQueryDeleteFilm, filmId);
+    }
+
+    @Override
     public Film updateFilm(Film film) {
         String sqlQuery = "UPDATE films SET name = ?, description = ?, releaseDate = ?, duration = ?, mpa_id = ? WHERE id = ?";
         jdbcTemplate.update(sqlQuery, film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(), film.getMpa().getId(), film.getId());

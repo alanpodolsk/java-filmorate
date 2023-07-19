@@ -7,6 +7,8 @@ import java.util.List;
 public interface FilmService {
     public Film addFilm(Film film);
 
+    public void deleteFilm(Integer filmId);
+
     public Film updateFilm(Film film);
 
     public List<Film> getAllFilms();

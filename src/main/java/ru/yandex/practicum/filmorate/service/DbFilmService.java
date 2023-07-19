@@ -27,6 +27,14 @@ public class DbFilmService implements FilmService {
     }
 
     @Override
+    public void deleteFilm(Integer filmId) {
+        if (filmId < 1 || filmDao.getFilmById(filmId) == null) {
+            throw new NoObjectException("Фильм с id = " + filmId + " не найден в базе");
+        }
+        filmDao.deleteFilm(filmId);
+    }
+
+    @Override
     public Film updateFilm(Film film) {
         isValid(film);
         if (filmDao.getFilmById(film.getId()) == null) {
