@@ -56,6 +56,7 @@ public class FilmDaoImpl implements FilmDao {
 
     @Override
     public List<Film> getAllFilms() {
+
         List<Film> films = jdbcTemplate.query("SELECT f.id, f.name, f.description, f.releaseDate, f.duration, " + "f.mpa_id, mpa_ratings.name as mpa_name from films f left join mpa_ratings on mpa_ratings.id = f.mpa_id ORDER BY f.id ASC", filmRowMapper());
         Map<Integer, Film> filmMap = new HashMap<>();
         for (Film film : films) {
@@ -142,3 +143,4 @@ public class FilmDaoImpl implements FilmDao {
         });
     }
 }
+
