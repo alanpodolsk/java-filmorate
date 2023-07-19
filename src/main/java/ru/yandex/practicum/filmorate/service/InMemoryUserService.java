@@ -147,7 +147,6 @@ public class InMemoryUserService implements UserService {
 
     @Override
     public List<Film> recommendFilms(Integer id) {
-
         return null;
     }
 }

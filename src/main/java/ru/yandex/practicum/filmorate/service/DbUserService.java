@@ -99,18 +99,18 @@ public class DbUserService implements UserService {
         Integer sameUserId = -1;
         Map<Integer,Integer> commonFilms = new HashMap<>();
         for(Film film : films) {
-            if(film.getLikes().contains(id)) {
+            if (film.getLikes().contains(id)) {
                 for (Integer usersId: film.getLikes()) {
-                    if(commonFilms.containsKey(usersId)) {
-                        commonFilms.put(usersId,commonFilms.get(usersId)+1);
+                    if (commonFilms.containsKey(usersId)) {
+                        commonFilms.put(usersId,commonFilms.get(usersId) + 1);
                     }
-                    commonFilms.put(usersId,1);
+                    commonFilms.put(usersId, 1);
                 }
             }
         }
         commonFilms.remove(id);
         for (Integer userId : commonFilms.keySet()) {
-            if(maxLikesCrossing < commonFilms.get(userId)) {
+            if (maxLikesCrossing < commonFilms.get(userId)) {
                 maxLikesCrossing = commonFilms.get(userId);
                 sameUserId = userId;
             }
@@ -124,7 +124,7 @@ public class DbUserService implements UserService {
         List<Film> films = filmDao.getAllFilms();
         Integer sameUserId = searchSameUser(films,id);
         for (Film film : films) {
-            if(film.getLikes().contains(sameUserId) && !(film.getLikes().contains(id))) {
+            if (film.getLikes().contains(sameUserId) && !(film.getLikes().contains(id))) {
                 recommendFilms.add(film);
             }
         }
