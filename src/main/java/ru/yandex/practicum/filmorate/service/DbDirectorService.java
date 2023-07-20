@@ -12,7 +12,7 @@ import java.util.List;
 @Service
 @AllArgsConstructor
 public class DbDirectorService implements DirectorService {
-    DirectorDao directorDao;
+    private DirectorDao directorDao;
 
 
     @Override

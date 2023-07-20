@@ -43,13 +43,13 @@ public class DirectorDaoImpl implements DirectorDao {
 
     @Override
     public List<Director> getDirectors() {
-        return jdbcTemplate.query("SELECT id, name FROM directors  ORDER BY id", mpaRowMapper());
+        return jdbcTemplate.query("SELECT id, name FROM directors  ORDER BY id", directorRowMapper());
     }
 
     @Override
     public Director getDirectorById(Integer id) {
         try {
-            return jdbcTemplate.queryForObject("SELECT id, name FROM directors WHERE id = ?", mpaRowMapper(), id);
+            return jdbcTemplate.queryForObject("SELECT id, name FROM directors WHERE id = ?", directorRowMapper(), id);
         } catch (EmptyResultDataAccessException e) {
             return null;
         }
@@ -61,7 +61,7 @@ public class DirectorDaoImpl implements DirectorDao {
         jdbcTemplate.update(sqlQuery, id);
     }
 
-    private RowMapper<Director> mpaRowMapper() {
+    private RowMapper<Director> directorRowMapper() {
         return (rs, rowNum) -> new Director(rs.getInt("id"), rs.getString("name"));
     }
 }

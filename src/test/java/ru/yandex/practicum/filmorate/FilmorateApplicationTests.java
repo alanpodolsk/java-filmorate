@@ -281,71 +281,79 @@ class FilmorateApplicationTests {
     @Test
     @DisplayName("Должен добавить режиссера")
     public void shouldAddDirector() {
+        // Act
         Director storedDirector = directorDao.addDirector(director1);
-        Assertions.assertNotNull(storedDirector.getId());
-
-        Assertions.assertEquals(storedDirector, directorDao.getDirectorById(storedDirector.getId()));
+        // Assert
+        Assertions.assertNotNull(storedDirector.getId(), "Возвращенный режиссер не имеет id");
+        Assertions.assertEquals(storedDirector, directorDao.getDirectorById(storedDirector.getId()), "Возвращен некорректный режиссер");
     }
 
     @Test
     @DisplayName("Должен обновить режиссера")
     public void shouldUpdateDirector() {
+        // Arrange
         Director storedDirector = directorDao.addDirector(director1);
         Director director2 = new Director(storedDirector.getId(), "Updated");
-
+        // Act
         director2 = directorDao.updateDirector(director2);
-
-        Assertions.assertNotEquals(storedDirector, director2);
-        Assertions.assertEquals(director2.getName(), "Updated");
+        // Assert
+        Assertions.assertNotEquals(storedDirector, director2, "Режиссер не был обновлен");
+        Assertions.assertEquals(director2.getName(), "Updated", "Имя режиссера не было обновлено");
     }
 
     @Test
     @DisplayName("Должен вернуть 2 режиссеров после добавления")
     public void shouldReturn2DirectorsInGetAll() {
+        // Arrange
         directorDao.addDirector(director1);
         directorDao.addDirector(new Director(null, "Director 2"));
-
+        // Act
         List<Director> directors = directorDao.getDirectors();
-
-        Assertions.assertEquals(directors.size(), 2);
+        // Assert
+        Assertions.assertEquals(directors.size(), 2, "Недостаточное количество режиссеров в списке");
     }
 
     @Test
     @DisplayName("Должен вернуть null при поиске по несуществующему id")
     public void shouldReturnNullOnNoExistingId() {
+        // Act
         Director director = directorDao.getDirectorById(34);
-
-        Assertions.assertNull(director);
+        // Assert
+        Assertions.assertNull(director, "Режиссер не должен существовать в базе");
     }
 
     @Test
     @DisplayName("Должен удалить добавленного режиссера")
     public void shouldDeleteDirector() {
+        // Arrange
         Director storedDirector = directorDao.addDirector(director1);
 
         storedDirector = directorDao.getDirectorById(storedDirector.getId());
-        Assertions.assertNotNull(storedDirector);
-
+        Assertions.assertNotNull(storedDirector, "Режиссер не был добавлен в базу");
+        // Act
         directorDao.deleteDirectorById(storedDirector.getId());
-        Assertions.assertNull(directorDao.getDirectorById(storedDirector.getId()));
+        // Assert
+        Assertions.assertNull(directorDao.getDirectorById(storedDirector.getId()), "Режиссер должен быть удален");
     }
 
     @Test
     @DisplayName("Фильм должен получить режиссера в Post films")
     public void shouldAddDirectorToFilm() {
+        // Arrange
         Director storedDirector = directorDao.addDirector(director1);
         Film film = new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50, null, null, new MPA(1, null));
         film.getDirectors().add(storedDirector);
-
+        // Act
         Film storedFilm = filmDao.addFilm(film);
         storedFilm = filmDao.getFilmById(storedFilm.getId());
-
-        Assertions.assertEquals(storedFilm.getDirectors().size(), 1);
+        // Assert
+        Assertions.assertEquals(storedFilm.getDirectors().size(), 1, "Режиссер не был добавлен к фильму");
     }
 
     @Test
     @DisplayName("Должен вывести список фильмов режиссера по возрастанию года")
     public void shouldReturnFilmListOfDirectorYearAscending() {
+        // Arrange
         Director storedDirector = directorDao.addDirector(director1);
 
         Film film1 = new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50, null, null, new MPA(1, null));
@@ -354,15 +362,17 @@ class FilmorateApplicationTests {
         film2.getDirectors().add(storedDirector);
         film1 = filmDao.addFilm(film1);
         film2 = filmDao.addFilm(film2);
-
+        // Act
         List<Film> films = filmDao.getFilmsByDirector(storedDirector.getId(), "year");
-        Assertions.assertEquals(film1.getReleaseDate(), films.get(0).getReleaseDate());
-        Assertions.assertEquals(film2.getReleaseDate(), films.get(1).getReleaseDate());
+        // Assert
+        Assertions.assertEquals(film1.getReleaseDate(), films.get(0).getReleaseDate(), "Фильм с годом 2000 должен быть первым");
+        Assertions.assertEquals(film2.getReleaseDate(), films.get(1).getReleaseDate(), "Фильм с годом 2010 должен быть вторым");
     }
 
     @Test
     @DisplayName("Должен вывести список фильмов режиссера по убыванию лайков")
     public void shouldReturnFilmListOfDirectorLikeDescending() {
+        // Arrange
         Director storedDirector = directorDao.addDirector(director1);
 
         Film film1 = new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50, null, null, new MPA(1, null));
@@ -380,9 +390,10 @@ class FilmorateApplicationTests {
         filmDao.addLike(film1.getId(), user1.getId());
         filmDao.addLike(film2.getId(), user1.getId());
         filmDao.addLike(film2.getId(), user2.getId());
-
+        // Act
         List<Film> films = filmDao.getFilmsByDirector(storedDirector.getId(), "likes");
-        Assertions.assertEquals(film2.getReleaseDate(), films.get(0).getReleaseDate());
-        Assertions.assertEquals(film1.getReleaseDate(), films.get(1).getReleaseDate());
+        // Assert
+        Assertions.assertEquals(film2.getReleaseDate(), films.get(0).getReleaseDate(), "Фильм 2 должен быть первым (2 лайка)");
+        Assertions.assertEquals(film1.getReleaseDate(), films.get(1).getReleaseDate(), "Фильм 1 должен быть вторым (1 лайк)");
     }
 }

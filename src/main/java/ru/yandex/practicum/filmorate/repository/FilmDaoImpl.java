@@ -121,10 +121,10 @@ public class FilmDaoImpl implements FilmDao {
         String orderBySql = (sortBy.equals("year")) ? "EXTRACT (YEAR FROM releaseDate)" :
                 "(SELECT COUNT(*) FROM LIKES l WHERE l.FILM_ID = f.id) DESC";
         List<Film> films = jdbcTemplate.query(
-                "SELECT f.* , mr.name as mr_name FROM directors d " +
+                "SELECT f.* , mpa_ratings.name as mpa_name FROM directors d " +
                         "LEFT JOIN film_directors fd ON d.id = fd.director_id " +
                         "LEFT JOIN films f ON fd.film_id = f.id " +
-                        "LEFT JOIN mpa_ratings mr ON mr.id = f.mpa_id " +
+                        "LEFT JOIN mpa_ratings ON mpa_ratings.id = f.mpa_id " +
                         "WHERE d.id = ? " +
                         "ORDER BY " +
                         orderBySql, filmRowMapper(), directorId);
