@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MPA;
@@ -28,12 +29,10 @@ public class FilmDaoImpl implements FilmDao {
         Map<String, String> params = Map.of("name", film.getName(), "description", film.getDescription(), "releaseDate", film.getReleaseDate().toString(), "duration", film.getDuration().toString(), "mpa_id", film.getMpa().getId().toString());
         Number id = simpleJdbcInsert.executeAndReturnKey(params);
         film.setId((Integer) id);
-        String sqlSubQuery = "INSERT INTO films_genres (film_id, genre_id) VALUES (?,?)";
-        if (film.getGenres() != null) {
-            for (Genre genre : film.getGenres()) {
-                jdbcTemplate.update(sqlSubQuery, film.getId(), genre.getId());
-            }
-        }
+
+        insertGenres(film);
+        insertDirectors(film);
+
         return film;
     }
 
@@ -42,15 +41,15 @@ public class FilmDaoImpl implements FilmDao {
         String sqlQuery = "UPDATE films SET name = ?, description = ?, releaseDate = ?, duration = ?, mpa_id = ? WHERE id = ?";
         jdbcTemplate.update(sqlQuery, film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(), film.getMpa().getId(), film.getId());
 
-        sqlQuery = "DELETE FROM films_genres WHERE film_id = ?";
-        jdbcTemplate.update(sqlQuery, film.getId());
+        String sqlQueryGenres = "DELETE FROM films_genres WHERE film_id = ?";
+        jdbcTemplate.update(sqlQueryGenres, film.getId());
 
-        sqlQuery = "INSERT INTO films_genres (film_id, genre_id) VALUES (?,?)";
-        if (film.getGenres() != null) {
-            for (Genre genre : film.getGenres()) {
-                jdbcTemplate.update(sqlQuery, film.getId(), genre.getId());
-            }
-        }
+        String sqlQueryDirectors = "DELETE FROM film_directors WHERE film_id = ?";
+        jdbcTemplate.update(sqlQueryDirectors, film.getId());
+
+        insertGenres(film);
+        insertDirectors(film);
+
         return film;
     }
 
@@ -63,6 +62,8 @@ public class FilmDaoImpl implements FilmDao {
             filmMap.put(film.getId(), film);
         }
         setGenres(filmMap);
+        setDirectors(filmMap);
+
         return films;
     }
 
@@ -76,6 +77,8 @@ public class FilmDaoImpl implements FilmDao {
         Map<Integer, Film> filmMap = new HashMap<>();
         filmMap.put(filmId, film);
         setGenres(filmMap);
+        setDirectors(filmMap);
+
         return film;
     }
 
@@ -109,6 +112,29 @@ public class FilmDaoImpl implements FilmDao {
             filmMap.put(film.getId(), film);
         }
         setGenres(filmMap);
+        setDirectors(filmMap);
+        return films;
+    }
+
+    @Override
+    public List<Film> getFilmsByDirector(Integer directorId, String sortBy) {
+        String orderBySql = (sortBy.equals("year")) ? "EXTRACT (YEAR FROM releaseDate)" :
+                "(SELECT COUNT(*) FROM LIKES l WHERE l.FILM_ID = f.id) DESC";
+        List<Film> films = jdbcTemplate.query(
+                "SELECT f.* , mpa_ratings.name as mpa_name FROM directors d " +
+                        "LEFT JOIN film_directors fd ON d.id = fd.director_id " +
+                        "LEFT JOIN films f ON fd.film_id = f.id " +
+                        "LEFT JOIN mpa_ratings ON mpa_ratings.id = f.mpa_id " +
+                        "WHERE d.id = ? " +
+                        "ORDER BY " +
+                        orderBySql, filmRowMapper(), directorId);
+        Map<Integer, Film> filmMap = new HashMap<>();
+        for (Film film : films) {
+            filmMap.put(film.getId(), film);
+        }
+        setGenres(filmMap);
+        setDirectors(filmMap);
+
         return films;
     }
 
@@ -129,6 +155,24 @@ public class FilmDaoImpl implements FilmDao {
         };
     }
 
+    private void insertGenres(Film film) {
+        String sqlSubQueryGenres = "INSERT INTO films_genres (film_id, genre_id) VALUES (?,?)";
+        if (film.getGenres() != null) {
+            for (Genre genre : film.getGenres()) {
+                jdbcTemplate.update(sqlSubQueryGenres, film.getId(), genre.getId());
+            }
+        }
+    }
+
+    private void insertDirectors(Film film) {
+        String sqlSubQueryDirectors = "INSERT INTO film_directors (film_id, director_id) VALUES (?, ?)";
+        if (film.getDirectors() != null) {
+            for (Director director: film.getDirectors()) {
+                jdbcTemplate.update(sqlSubQueryDirectors, film.getId(), director.getId());
+            }
+        }
+    }
+
     private void setGenres(Map<Integer, Film> films) {
         Set<Integer> filmsIds = films.keySet();
         if (filmsIds.isEmpty()) {
@@ -140,6 +184,23 @@ public class FilmDaoImpl implements FilmDao {
         namedParameterJdbcTemplate.query(sql, param, (rs, rownum) -> {
             Film film = films.get(rs.getInt("film_id"));
             return film.getGenres().add(new Genre(rs.getInt("id"), rs.getString("name")));
+        });
+    }
+
+    private void setDirectors(Map<Integer, Film> films) {
+        Set<Integer> filmsIds = films.keySet();
+        if (filmsIds.isEmpty()) {
+            return;
+        }
+
+        SqlParameterSource param = new MapSqlParameterSource("filmsId", filmsIds);
+        NamedParameterJdbcTemplate namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
+        String sql = "SELECT d.id, d.name, fd.film_id FROM directors d " +
+                "JOIN film_directors fd ON d.id = fd.director_id " +
+                "WHERE fd.film_id IN (:filmsId) ORDER BY fd.film_id, d.id";
+        namedParameterJdbcTemplate.query(sql, param, (rs, rownum) -> {
+            Film film = films.get(rs.getInt("film_id"));
+            return film.getDirectors().add(new Director(rs.getInt("id"), rs.getString("name")));
         });
     }
 }
