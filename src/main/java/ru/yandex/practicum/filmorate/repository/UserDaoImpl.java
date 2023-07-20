@@ -40,9 +40,9 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public void deleteUser(Integer userId) {
-        String sqlQueryDeleteFriends = "DELETE FROM friends WHERE friend_id = ? OR user_id = ?";
+        String sqlQueryDeleteFriends = "DELETE FROM friends WHERE friend_id = ?";
         String sqlQueryDeleteUser = "DELETE FROM users WHERE id = ?";
-        jdbcTemplate.update(sqlQueryDeleteFriends, userId, userId);
+        jdbcTemplate.update(sqlQueryDeleteFriends, userId);
         jdbcTemplate.update(sqlQueryDeleteUser, userId);
     }
 

@@ -32,14 +32,13 @@ duration integer,
 mpa_id integer not null references mpa_ratings(id));
 
 CREATE TABLE if not exists likes(
-film_id integer not null references films(id),
+film_id integer not null references films(id) on delete cascade,
 user_id integer not null references users(id));
 
 CREATE TABLE if not exists friends(
-user_id integer not null references users(id),
+user_id integer not null references users(id) on delete cascade,
 friend_id integer not null references users(id));
 
 CREATE TABLE if not exists films_genres(
-film_id integer not null references films(id),
+film_id integer not null references films(id) on delete cascade,
 genre_id integer not null references genres(id));
-

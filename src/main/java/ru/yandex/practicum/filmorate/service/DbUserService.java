@@ -26,10 +26,9 @@ public class DbUserService implements UserService {
 
     @Override
     public void deleteUser(Integer userId) {
-        if (userId < 1 || userDao.getUserById(userId) == null) {
-            throw new NoObjectException("Пользователь с ID =" + userId + " не найден");
+        if (userId > 0 || userDao.getUserById(userId) != null) {
+            userDao.deleteUser(userId);
         }
-        userDao.deleteUser(userId);
     }
 
     @Override
