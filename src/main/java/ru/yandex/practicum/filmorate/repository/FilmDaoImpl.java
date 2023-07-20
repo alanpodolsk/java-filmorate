@@ -56,7 +56,7 @@ public class FilmDaoImpl implements FilmDao {
 
     @Override
     public List<Film> getAllFilms() {
-        List<Film> films = jdbcTemplate.query("SELECT f.id, f.name, f.description, f.releaseDate, f.duration, " + "f.mpa_id, mpa_ratings.name from films f left join mpa_ratings on mpa_ratings.id = f.mpa_id ORDER BY f.id ASC", filmRowMapper());
+        List<Film> films = jdbcTemplate.query("SELECT f.id, f.name, f.description, f.releaseDate, f.duration, " + "f.mpa_id, mpa_ratings.name as mpa_name from films f left join mpa_ratings on mpa_ratings.id = f.mpa_id ORDER BY f.id ASC", filmRowMapper());
         Map<Integer, Film> filmMap = new HashMap<>();
         for (Film film : films) {
             filmMap.put(film.getId(), film);
@@ -67,7 +67,7 @@ public class FilmDaoImpl implements FilmDao {
 
     @Override
     public Film getFilmById(Integer filmId) {
-        List<Film> films = jdbcTemplate.query("SELECT f.id, f.name, f.description, f.releaseDate, f.duration, " + "f.mpa_id, mpa_ratings.name from films f left join mpa_ratings on mpa_ratings.id = f.mpa_id WHERE f.id = ? ORDER BY f.id ASC", filmRowMapper(), filmId);
+        List<Film> films = jdbcTemplate.query("SELECT f.id, f.name, f.description, f.releaseDate, f.duration, " + "f.mpa_id, mpa_ratings.name as mpa_name from films f left join mpa_ratings on mpa_ratings.id = f.mpa_id WHERE f.id = ? ORDER BY f.id ASC", filmRowMapper(), filmId);
         if (films.size() != 1) {
             return null;
         }
@@ -100,9 +100,9 @@ public class FilmDaoImpl implements FilmDao {
     @Override
     public List<Film> getPopularFilms(Integer count) {
         List<Film> films = jdbcTemplate.query("SELECT f.id, f.name, f.description, f.releaseDate, f.duration," +
-                " f.mpa_id, mpa_ratings.name, COUNT(l.user_id)" +
+                " f.mpa_id, mpa_ratings.name  as mpa_name, COUNT(l.user_id)" +
                 " from films f left join mpa_ratings on mpa_ratings.id = f.mpa_id left join likes l on l.film_id = f.id " +
-                "GROUP BY f.id, f.name, f.description, f.releaseDate, f.duration, f.mpa_id, mpa_ratings.name ORDER BY f.id DESC LIMIT ?", filmRowMapper(),count);
+                "GROUP BY f.id, f.name, f.description, f.releaseDate, f.duration, f.mpa_id, mpa_ratings.name ORDER BY f.id DESC LIMIT ?", filmRowMapper(), count);
         Map<Integer, Film> filmMap = new HashMap<>();
         for (Film film : films) {
             filmMap.put(film.getId(), film);
@@ -121,7 +121,7 @@ public class FilmDaoImpl implements FilmDao {
             film.setDescription(rs.getString("description"));
             film.setReleaseDate(LocalDate.parse(rs.getDate("releaseDate").toString()));
             film.setDuration(rs.getInt("duration"));
-            film.setMpa(new MPA(rs.getInt("mpa_id"), rs.getString("mpa_ratings.name")));
+            film.setMpa(new MPA(rs.getInt("mpa_id"), rs.getString("mpa_name")));
             film.setLikes(new HashSet<>(getLikes(film.getId())));
             film.setGenres(new HashSet<>());
             return film;
@@ -142,4 +142,3 @@ public class FilmDaoImpl implements FilmDao {
         });
     }
 }
-

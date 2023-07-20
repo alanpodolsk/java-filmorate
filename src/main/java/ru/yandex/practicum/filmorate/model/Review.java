@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Review {
-    Integer id;
+    Integer reviewId;
     Boolean isPositive;
     String content;
     Integer userId;
