@@ -96,6 +96,11 @@ public class InMemoryFilmService implements FilmService {
         }
     }
 
+    @Override
+    public List<Film> getFilmsByDirector(Integer directorId, String sortBy) {
+        return null;
+    }
+
     private Film isValid(Film film) {
         if (film == null) {
             throw new ValidationException("Передан пустой объект фильма");

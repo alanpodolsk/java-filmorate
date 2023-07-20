@@ -18,6 +18,8 @@ public interface FilmService {
     public List<Film> getPopularFilms(Integer count);
 
     public Film getFilm(Integer id);
+
+    List<Film> getFilmsByDirector(Integer directorId, String sortBy);
 }
 
 
