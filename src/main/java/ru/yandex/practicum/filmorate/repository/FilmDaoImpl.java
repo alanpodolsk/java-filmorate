@@ -139,28 +139,6 @@ public class FilmDaoImpl implements FilmDao {
     }
 
     @Override
-    public List<Film> getFilmsByDirector(Integer directorId, String sortBy) {
-        String orderBySql = (sortBy.equals("year")) ? "EXTRACT (YEAR FROM releaseDate)" :
-                "(SELECT COUNT(*) FROM LIKES l WHERE l.FILM_ID = f.id) DESC";
-        List<Film> films = jdbcTemplate.query(
-                "SELECT f.* , mpa_ratings.name as mpa_name FROM directors d " +
-                        "LEFT JOIN film_directors fd ON d.id = fd.director_id " +
-                        "LEFT JOIN films f ON fd.film_id = f.id " +
-                        "LEFT JOIN mpa_ratings ON mpa_ratings.id = f.mpa_id " +
-                        "WHERE d.id = ? " +
-                        "ORDER BY " +
-                        orderBySql, filmRowMapper(), directorId);
-        Map<Integer, Film> filmMap = new HashMap<>();
-        for (Film film : films) {
-            filmMap.put(film.getId(), film);
-        }
-        setGenres(filmMap);
-        setDirectors(filmMap);
-
-        return films;
-    }
-
-    @Override
     public List<Film> getFilmsSearch(String text, List<String> lsFilm1) {
         List<Film> f = getFilmPr(text, lsFilm1);
         List<Film> ans = new ArrayList<>();
