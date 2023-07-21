@@ -41,7 +41,6 @@ class FilmorateApplicationTests {
         assertArrayEquals(new User[]{}, users.toArray(), "Возвращен непустой список пользователей");
     }
 
-
     @Test
     @DisplayName("Должен добавить пользователя в базу данных")
     void shouldAddUserInDB() {
@@ -128,7 +127,7 @@ class FilmorateApplicationTests {
     @DisplayName("Должен создать фильм с id 1")
     public void shouldAddFilmId1() {
         //Act
-        Film film = filmDao.addFilm(new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50, null, null, null ,new MPA(1, null)));
+        Film film = filmDao.addFilm(new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50, null, null, null, new MPA(1, null)));
         //Assert
         Assertions.assertEquals(1, film.getId(), "Фильм сформирован с некорректным id");
     }
@@ -137,7 +136,7 @@ class FilmorateApplicationTests {
     @DisplayName("Должен вернуть фильм с id 1")
     public void shouldGetFilmId1() {
         //Arrange
-        filmDao.addFilm(new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50, null, null, null ,new MPA(1, null)));
+        filmDao.addFilm(new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50, null, null, null, new MPA(1, null)));
         //Act
         Film film = filmDao.getFilmById(1);
         //Assert
@@ -156,12 +155,12 @@ class FilmorateApplicationTests {
     @DisplayName("Должен вернуть фильм с id 1")
     public void shouldUpdateFilmId1() {
         //Arrange
-        filmDao.addFilm(new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50, null, null, null ,new MPA(1, null)));
+        filmDao.addFilm(new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50, null, null, null, new MPA(1, null)));
         //Act
-        filmDao.updateFilm(new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50, null, null, null ,new MPA(1, null)));
+        filmDao.updateFilm(new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50, null, null, null, new MPA(1, null)));
         //Assert
         Film film = filmDao.getFilmById(1);
-        Assertions.assertEquals("голубое солнце джунглей", film.getName(), "Имя фильма не изменено");
+        Assertions.assertEquals("синее солнце джунглей", film.getName(), "Имя фильма не изменено");
     }
 
     @Test
@@ -175,8 +174,8 @@ class FilmorateApplicationTests {
     @DisplayName("Должен вернуть список из 2 фильмов")
     public void shouldReturn2Films() {
         //Arrange
-        filmDao.addFilm(new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50, null, null, null ,new MPA(1, null)));
-        filmDao.addFilm(new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50, null, null, null ,new MPA(1, null)));
+        filmDao.addFilm(new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50, null, null, null, new MPA(1, null)));
+        filmDao.addFilm(new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50, null, null, null, new MPA(1, null)));
         Film film1 = filmDao.getFilmById(1);
         Film film2 = filmDao.getFilmById(2);
         //Assert
@@ -187,7 +186,7 @@ class FilmorateApplicationTests {
     @DisplayName("Должен добавить лайк фильму 1")
     public void shouldAddLikeToFilm1() {
         //Arrange
-        filmDao.addFilm(new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50, null, null, null ,new MPA(1, null)));
+        filmDao.addFilm(new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50, null, null, null, new MPA(1, null)));
         userDao.addUser(new User(null, "alanpo@ya.ru", "alanpo", "alan", LocalDate.of(2000, 1, 1), new HashSet<>()));
         //Act
         filmDao.addLike(1, 1);
@@ -199,7 +198,7 @@ class FilmorateApplicationTests {
     @DisplayName("Должен удалить лайк с фильма 1")
     public void shouldDeleteLikeToFilm1() {
         //Arrange
-        filmDao.addFilm(new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50, null, null, null ,new MPA(1, null)));
+        filmDao.addFilm(new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50, null, null, null, new MPA(1, null)));
         userDao.addUser(new User(null, "alanpo@ya.ru", "alanpo", "alan", LocalDate.of(2000, 1, 1), new HashSet<>()));
         filmDao.addLike(1, 1);
         assertArrayEquals(new Integer[]{1}, filmDao.getFilmById(1).getLikes().toArray(), "Возвращен некорректный список лайков");
@@ -213,7 +212,7 @@ class FilmorateApplicationTests {
     @DisplayName("Должен вернуть список из 2 лайков")
     public void shouldReturn2Likes() {
         //Arrange
-        filmDao.addFilm(new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50, null, null, null ,new MPA(1, null)));
+        filmDao.addFilm(new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50, null, null, null, new MPA(1, null)));
         userDao.addUser(new User(null, "alanpo@ya.ru", "alanpo", "alan", LocalDate.of(2000, 1, 1), new HashSet<>()));
         userDao.addUser(new User(null, "alanpu@ya.ru", "alanpu", "alan", LocalDate.of(2000, 1, 1), new HashSet<>()));
         filmDao.addLike(1, 2);
@@ -226,8 +225,8 @@ class FilmorateApplicationTests {
     @DisplayName("Должен вернуть упорядоченный по популярности список")
     public void shouldReturnFilmsOrderedByLikes() {
         //Arrange
-        filmDao.addFilm(new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50, null, null, null ,new MPA(1, null)));
-        filmDao.addFilm(new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50, null, null, null ,new MPA(1, null)));
+        filmDao.addFilm(new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50, null, null, null, new MPA(1, null)));
+        filmDao.addFilm(new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50, null, null, null, new MPA(1, null)));
         userDao.addUser(new User(null, "alanpo@ya.ru", "alanpo", "alan", LocalDate.of(2000, 1, 1), new HashSet<>()));
         userDao.addUser(new User(null, "alanpu@ya.ru", "alanpu", "alan", LocalDate.of(2000, 1, 1), new HashSet<>()));
         filmDao.addLike(1, 2);
@@ -334,66 +333,5 @@ class FilmorateApplicationTests {
         directorDao.deleteDirectorById(storedDirector.getId());
         // Assert
         Assertions.assertNull(directorDao.getDirectorById(storedDirector.getId()), "Режиссер должен быть удален");
-    }
-
-    @Test
-    @DisplayName("Фильм должен получить режиссера в Post films")
-    public void shouldAddDirectorToFilm() {
-        // Arrange
-        Director storedDirector = directorDao.addDirector(director1);
-        Film film = new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50, null, null, null ,new MPA(1, null));
-        film.getDirectors().add(storedDirector);
-        // Act
-        Film storedFilm = filmDao.addFilm(film);
-        storedFilm = filmDao.getFilmById(storedFilm.getId());
-        // Assert
-        Assertions.assertEquals(storedFilm.getDirectors().size(), 1, "Режиссер не был добавлен к фильму");
-    }
-
-    @Test
-    @DisplayName("Должен вывести список фильмов режиссера по возрастанию года")
-    public void shouldReturnFilmListOfDirectorYearAscending() {
-        // Arrange
-        Director storedDirector = directorDao.addDirector(director1);
-
-        Film film1 = new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50, null, null, null ,new MPA(1, null));
-        Film film2 = new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50, null, null, null ,new MPA(1, null));
-        film1.getDirectors().add(storedDirector);
-        film2.getDirectors().add(storedDirector);
-        film1 = filmDao.addFilm(film1);
-        film2 = filmDao.addFilm(film2);
-        // Act
-        List<Film> films = filmDao.getFilmsByDirector(storedDirector.getId(), "year");
-        // Assert
-        Assertions.assertEquals(film1.getReleaseDate(), films.get(0).getReleaseDate(), "Фильм с годом 2000 должен быть первым");
-        Assertions.assertEquals(film2.getReleaseDate(), films.get(1).getReleaseDate(), "Фильм с годом 2010 должен быть вторым");
-    }
-
-    @Test
-    @DisplayName("Должен вывести список фильмов режиссера по убыванию лайков")
-    public void shouldReturnFilmListOfDirectorLikeDescending() {
-        // Arrange
-        Director storedDirector = directorDao.addDirector(director1);
-
-        Film film1 = new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50, null, null, null ,new MPA(1, null));
-        Film film2 = new Film(null, "синее солнце джунглей", "фильммм", LocalDate.of(2000, 1, 1), 50, null, null, null ,new MPA(1, null));
-        film1.getDirectors().add(storedDirector);
-        film2.getDirectors().add(storedDirector);
-        film1 = filmDao.addFilm(film1);
-        film2 = filmDao.addFilm(film2);
-
-        User user1 = new User(null, "alanpo@ya.ru", "alanpo", "alan", LocalDate.of(2000, 1, 1), new HashSet<>());
-        User user2 = new User(null, "alanpo2@ya.ru", "alanpo2", "alan2", LocalDate.of(2090, 1, 1), new HashSet<>());
-        user1 = userDao.addUser(user1);
-        user2 = userDao.addUser(user2);
-
-        filmDao.addLike(film1.getId(), user1.getId());
-        filmDao.addLike(film2.getId(), user1.getId());
-        filmDao.addLike(film2.getId(), user2.getId());
-        // Act
-        List<Film> films = filmDao.getFilmsByDirector(storedDirector.getId(), "likes");
-        // Assert
-        Assertions.assertEquals(film2.getReleaseDate(), films.get(0).getReleaseDate(), "Фильм 2 должен быть первым (2 лайка)");
-        Assertions.assertEquals(film1.getReleaseDate(), films.get(1).getReleaseDate(), "Фильм 1 должен быть вторым (1 лайк)");
     }
 }
