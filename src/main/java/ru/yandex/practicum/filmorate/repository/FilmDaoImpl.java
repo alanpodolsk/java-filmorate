@@ -140,30 +140,14 @@ public class FilmDaoImpl implements FilmDao {
 
     @Override
     public List<Film> getFilmsSearch(String text, List<String> lsFilm1) {
-        List<Film> f = getFilmPr(text, lsFilm1);
-        List<Film> ans = new ArrayList<>();
-        for (Film o : f) {
-            for (Film o1 : getAllFilms()) {
-                if (o1.getId() == o.getId()) {
-                    List<Genre> ls = new ArrayList<>(o.getGenres());
-                    List<Director> ls1 = new ArrayList<>(o.getDirectors());
-                    if (ls.get(0).getName() == null) {
-                        o.setGenres(new HashSet<>());
-                    }
-                    if (ls.get(0).getName() == null) {
-                        o.setDirectors(new HashSet<>());
-                    }
-                    ans.add(o);
-                }
-            }
+        List<Film> films = getFilmPr(text, lsFilm1);
+        Map<Integer, Film> filmMap = new HashMap<>();
+        for (Film film : films) {
+            filmMap.put(film.getId(), film);
         }
-        Map<Integer, Film> m = new HashMap<>();
-        int i = 1;
-        for (Film o : ans) {
-            m.put(i, o);
-            i++;
-        }
-        return new ArrayList<>(m.values());
+        setDirectors(filmMap);
+        setGenres(filmMap);
+        return films;
     }
 
 
@@ -173,29 +157,26 @@ public class FilmDaoImpl implements FilmDao {
         }
         if (ls1.size() == 2) {
             return jdbcTemplate.query("SELECT f.id, f.name, f.description, f.releaseDate, f.duration, f.mpa_id," +
-                    " mpa_ratings.name  as mpa_name, max(g.id) as id_genre,max(g.name) as genre_name, count(fd.film_id)," +
-                    " COUNT(l.user_id), max(d.name) as name_dir, max(d.id) as id_dir  from films f left join mpa_ratings " +
-                    "on mpa_ratings.id = f.mpa_id  left join likes l on l.film_id = f.id left join film_directors as fd " +
-                    "on fd.film_id = f.id left join directors as d on d.id=fd.director_id  left join films_genres as fg " +
-                    "on fg.film_id = f.id left join genres as g on g.id = fg.genre_id where lower(f.name) like " +
-                    "lower('%" + text + "%') or lower(d.name) like lower('%" + text + "%') GROUP BY f.id, f.name, " +
-                    "f.description, f.releaseDate, f.duration, f.mpa_id, mpa_ratings.name ORDER BY f.id desc", filmRowMapper());
+                    " mpa_ratings.name  as mpa_name," +
+                    " COUNT(l.user_id), d.name from films f left join mpa_ratings " +
+                    "on mpa_ratings.id = f.mpa_id  left join likes l on l.film_id = f.id  left join film_directors as fd on fd.film_id = f.id left join directors as d on d.id = fd.director_id " +
+                    "where lower(f.name) like " +
+                    " lower('%" + text + "%') or lower(d.name) like lower('%" + text + "%') GROUP BY f.id, f.name, " +
+                    "f.description, f.releaseDate, f.duration, f.mpa_id, mpa_ratings.name ORDER BY count(l.user_id) desc, f.id desc", filmRowMapper());
         } else if (ls1.get(0).equals("director")) {
-            return jdbcTemplate.query("SELECT f.id, f.name, f.description, f.releaseDate, f.duration, f.mpa_id," +
-                    " mpa_ratings.name  as mpa_name, max(g.id) as id_genre,max(g.name) as genre_name, " +
-                    "count(fd.film_id), COUNT(l.user_id), max(d.name) as name_dir, max(d.id) as id_dir  " +
-                    "from films f left join mpa_ratings on mpa_ratings.id = f.mpa_id  left join likes l on l.film_id = f.id " +
-                    "left join film_directors as fd on fd.film_id = f.id left join directors as d on d.id=fd.director_id  " +
-                    "left join films_genres as fg on fg.film_id = f.id left join genres as g on g.id = fg.genre_id" +
-                    " where  lower(d.name) like lower('%" + text + "%') GROUP BY f.id, f.name, f.description, f.releaseDate," +
-                    " f.duration, f.mpa_id, mpa_ratings.name ORDER BY f.id desc ", filmRowMapper());
+            return jdbcTemplate.query("SELECT f.id, f.name, f.description, f.releaseDate, f.duration, f.mpa_id, " +
+                    " mpa_ratings.name  as mpa_name, " +
+                    " COUNT(l.user_id), d.name " +
+                    "from films f left join mpa_ratings on mpa_ratings.id = f.mpa_id  left join likes l on l.film_id = f.id left join film_directors as fd on fd.film_id = f.id left join directors as d on d.id = fd.director_id  " +
+                    " where  lower(d.name) like lower('%" + text + "%') GROUP BY f.id, f.name, f.description, f.releaseDate, " +
+                    " f.duration, f.mpa_id, mpa_ratings.name ORDER BY count(l.user_id) desc, f.id desc ", filmRowMapper());
         } else if (ls1.get(0).equals("title")) {
-            return jdbcTemplate.query("SELECT f.id, f.name, f.description, f.releaseDate, f.duration, f.mpa_id," +
-                    " mpa_ratings.name  as mpa_name, max(g.id) as id_genre,max(g.name) as genre_name, count(fd.film_id), " +
-                    "COUNT(l.user_id), max(d.name) as name_dir, max(d.id) as id_dir  from films f left join mpa_ratings on mpa_ratings.id = f.mpa_id  " +
-                    "left join likes l on l.film_id = f.id left join film_directors as fd on fd.film_id = f.id left join directors as d on d.id=fd.director_id " +
-                    " left join films_genres as fg on fg.film_id = f.id left join genres as g on g.id = fg.genre_id where lower(f.name) like lower('%" + text + "%')" +
-                    " GROUP BY f.id, f.name, f.description, f.releaseDate, f.duration, f.mpa_id, mpa_ratings.name ORDER BY f.id desc", filmRowMapper());
+            return jdbcTemplate.query("SELECT f.id, f.name, f.description, f.releaseDate, f.duration, f.mpa_id, " +
+                    " mpa_ratings.name  as mpa_name, " +
+                    " COUNT(l.user_id) from films f left join mpa_ratings on mpa_ratings.id = f.mpa_id  " +
+                    " left join likes l on l.film_id = f.id   " +
+                    " where lower(f.name) like lower('%" + text + "%') " +
+                    " GROUP BY f.id, f.name, f.description, f.releaseDate, f.duration, f.mpa_id, mpa_ratings.name ORDER BY count(l.user_id) desc, f.id desc", filmRowMapper());
         } else {
             throw new ValidationException("Wrong command");
         }
@@ -214,20 +195,7 @@ public class FilmDaoImpl implements FilmDao {
             film.setDuration(rs.getInt("duration"));
             film.setMpa(new MPA(rs.getInt("mpa_id"), rs.getString("mpa_name")));
             film.setLikes(new HashSet<>(getLikes(film.getId())));
-            try {
-                Set<Genre> s = new HashSet<>();
-                s.add(new Genre(rs.getInt("id_genre"), rs.getString("genre_name")));
-                film.setGenres(s);
-            } catch (Exception e) {
-                film.setGenres(new HashSet<>());
-            }
-            try {
-                Set<Director> d = new HashSet<>();
-                d.add(new Director(rs.getInt("id_dir"), rs.getString("name_dir")));
-                film.setDirectors(d);
-            } catch (Exception e) {
-                film.setGenres(new HashSet<>());
-            }
+            film.setGenres(new HashSet<>());
             return film;
         };
     }
@@ -252,9 +220,6 @@ public class FilmDaoImpl implements FilmDao {
 
     private void setGenres(Map<Integer, Film> films) {
         Set<Integer> filmsIds = films.keySet();
-        if (filmsIds.isEmpty()) {
-            return;
-        }
         SqlParameterSource param = new MapSqlParameterSource("filmsId", filmsIds);
         NamedParameterJdbcTemplate namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
         String sql = "SELECT g.id, g.name, fg.film_id FROM genres g " + "JOIN films_genres fg ON g.id = fg.genre_id " + "WHERE fg.film_id IN (:filmsId) ORDER BY fg.film_id ASC, g.id ASC";

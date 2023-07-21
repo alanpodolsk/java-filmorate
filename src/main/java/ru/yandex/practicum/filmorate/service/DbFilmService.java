@@ -97,9 +97,6 @@ public class DbFilmService implements FilmService {
     @Override
     public List<Film> getFilmsSearch(String text, List<String> ls) {
         try {
-            if (text.isBlank()) {
-                return getAllFilms();
-            }
             return filmDao.getFilmsSearch(text, ls);
         } catch (Exception e) {
             throw new ValidationException(e.getMessage());
