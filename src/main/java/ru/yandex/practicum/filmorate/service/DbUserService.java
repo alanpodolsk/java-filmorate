@@ -25,6 +25,13 @@ public class DbUserService implements UserService {
     }
 
     @Override
+    public void deleteUser(Integer userId) {
+        if (userId > 0 || userDao.getUserById(userId) != null) {
+            userDao.deleteUser(userId);
+        }
+    }
+
+    @Override
     public User updateUser(User user) {
         isValid(user);
         if (user.getId() == null || userDao.getUserById(user.getId()) == null) {

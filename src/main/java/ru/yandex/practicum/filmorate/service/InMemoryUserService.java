@@ -22,6 +22,10 @@ public class InMemoryUserService implements UserService {
     }
 
     @Override
+    public void deleteUser(Integer userId) {
+    }
+
+    @Override
     public User updateUser(User user) {
         isValid(user);
         if (user.getId() == null || userStorage.getUser(user.getId()) == null) {
