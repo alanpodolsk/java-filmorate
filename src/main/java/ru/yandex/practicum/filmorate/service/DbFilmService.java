@@ -5,7 +5,9 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NoObjectException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.repository.DirectorDao;
 import ru.yandex.practicum.filmorate.repository.FilmDao;
 import ru.yandex.practicum.filmorate.repository.UserDao;
 
@@ -19,6 +21,7 @@ import java.util.List;
 public class DbFilmService implements FilmService {
     private FilmDao filmDao;
     private UserDao userDao;
+    private DirectorDao directorDao;
 
     @Override
     public Film addFilm(Film film) {
@@ -86,6 +89,15 @@ public class DbFilmService implements FilmService {
         } else {
             return film;
         }
+    }
+
+    public List<Film> getFilmsByDirector(Integer directorId, String sortBy) {
+        Director director = directorDao.getDirectorById(directorId);
+        if (director == null) {
+            throw new NoObjectException("Режиссер с id = " + directorId + "не найден в базе");
+        }
+
+        return filmDao.getFilmsByDirector(directorId, sortBy);
     }
 
     private Film isValid(Film film) {
