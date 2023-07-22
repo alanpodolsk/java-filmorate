@@ -20,6 +20,11 @@ public class UserController {
         return userService.addUser(user);
     }
 
+    @DeleteMapping("/{userId}")
+    public void deleteUser(@PathVariable Integer userId) {
+        userService.deleteUser(userId);
+    }
+
     @GetMapping
     public List<User> getAllUsers() {
         return userService.getAllUsers();

@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 
@@ -19,5 +20,6 @@ public class Film {
     Integer duration;
     Set<Integer> likes;
     Set<Genre> genres;
+    final Set<Director> directors = new HashSet<>();
     MPA mpa;
 }

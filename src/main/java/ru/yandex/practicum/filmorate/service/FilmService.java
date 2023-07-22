@@ -7,6 +7,8 @@ import java.util.List;
 public interface FilmService {
     public Film addFilm(Film film);
 
+    public void deleteFilm(Integer filmId);
+
     public Film updateFilm(Film film);
 
     public List<Film> getAllFilms();
@@ -18,6 +20,8 @@ public interface FilmService {
     public List<Film> getPopularFilms(Integer count);
 
     public Film getFilm(Integer id);
+
+    List<Film> getFilmsByDirector(Integer directorId, String sortBy);
 }
 
 
