@@ -93,15 +93,6 @@ public class DbFilmService implements FilmService {
         return filmDao.getFilmsByDirector(directorId, sortBy);
     }
 
-    @Override
-    public List<Film> getCommonFilms(Integer userId, Integer friendId) {
-        try {
-            return filmDao.getCommonFilms(userId, friendId);
-        } catch (Exception e) {
-            throw new NoObjectException("Nothing found");
-        }
-    }
-
 
     @Override
     public List<Film> getFilmsSearch(String text, List<String> ls) {
