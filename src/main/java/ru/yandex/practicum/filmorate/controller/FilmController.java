@@ -20,6 +20,11 @@ public class FilmController {
         return filmService.addFilm(film);
     }
 
+    @DeleteMapping("/{filmId}")
+    public void deleteFilm(@PathVariable Integer filmId) {
+        filmService.deleteFilm(filmId);
+    }
+
     @GetMapping
     public List<Film> getAllFilms() {
         return filmService.getAllFilms();
@@ -48,6 +53,12 @@ public class FilmController {
     @GetMapping("/{id}")
     public Film getFilm(@PathVariable Integer id) {
         return filmService.getFilm(id);
+    }
+
+    @GetMapping("/director/{directorId}")
+    public List<Film> getFilmByDirector(@PathVariable Integer directorId,
+                                        @RequestParam(defaultValue = "likes") String sortBy) {
+        return filmService.getFilmsByDirector(directorId, sortBy);
     }
 }
 

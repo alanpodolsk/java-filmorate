@@ -7,6 +7,8 @@ import java.util.List;
 public interface FilmDao {
     public Film addFilm(Film film);
 
+    public void deleteFilm(Integer filmId);
+
     public Film updateFilm(Film film);
 
     public List<Film> getAllFilms();
@@ -20,4 +22,6 @@ public interface FilmDao {
     public void deleteLike(Integer filmId, Integer userId);
 
     public List<Film> getPopularFilms(Integer count);
+
+    List<Film> getFilmsByDirector(Integer directorId, String sortBy);
 }
