@@ -115,4 +115,28 @@ public class UserDaoImpl implements UserDao {
     private List<Integer> getFriendsIds(Integer id) {
         return jdbcTemplate.query("SELECT friend_id From friends where user_id = ?", (rs, rowNum) -> rs.getInt("friend_id"), id);
     }
+
+    public List<Integer> searchSameUser(Integer id) {
+        return jdbcTemplate.query("SELECT user_id,COUNT(distinct film_id) from likes " +
+                "WHERE film_id IN (SELECT distinct film_id from likes where user_id = ?) " +
+                "GROUP BY user_id " +
+                "ORDER BY COUNT(distinct film_id) DESC " +
+                "LIMIT 2", (rs , rowNum) -> {
+                                            rs.getInt("COUNT(distinct film_id)");
+                                            return  rs.getInt("user_id");
+                                            },id);
+    }
+
+    @Override
+    public List<Integer> recommendFilmsId(Integer id) {
+        List<Integer> sameUserId = searchSameUser(id);
+        if (sameUserId.size() < 2) {
+            return new ArrayList<>();
+        }
+        return jdbcTemplate.query("SELECT id from films " +
+                "WHERE id in " +
+                "(SELECT distinct film_id from likes where user_id = ?) " +
+                "EXCEPT " +
+                "(SELECT distinct film_id from likes where user_id = ?)",(rs, rowNum) -> rs.getInt("id"),sameUserId.get(1), id);
+    }
 }

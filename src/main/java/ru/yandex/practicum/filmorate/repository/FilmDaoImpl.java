@@ -142,5 +142,6 @@ public class FilmDaoImpl implements FilmDao {
             return film.getGenres().add(new Genre(rs.getInt("id"), rs.getString("name")));
         });
     }
+
 }
 

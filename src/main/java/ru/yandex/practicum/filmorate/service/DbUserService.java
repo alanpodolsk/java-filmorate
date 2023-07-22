@@ -94,41 +94,13 @@ public class DbUserService implements UserService {
         }
     }
 
-    public Integer searchSameUser(List<Film> films,Integer id) {
-        Integer maxLikesCrossing = 0;
-        Integer sameUserId = -1;
-        Map<Integer,Integer> commonFilms = new HashMap<>();
-        for (Film film : films) {
-            if (film.getLikes().contains(id)) {
-                for (Integer usersId : film.getLikes()) {
-                    if (commonFilms.containsKey(usersId)) {
-                        commonFilms.put(usersId,commonFilms.get(usersId) + 1);
-                    }
-                    commonFilms.put(usersId, 1);
-                }
-            }
-        }
-        commonFilms.remove(id);
-        for (Integer userId : commonFilms.keySet()) {
-            if (maxLikesCrossing < commonFilms.get(userId)) {
-                maxLikesCrossing = commonFilms.get(userId);
-                sameUserId = userId;
-            }
-        }
-        return sameUserId;
-    }
-
     @Override
     public List<Film> recommendFilms(Integer id) {
-        List<Film> recommendFilms = new ArrayList<>();
-        List<Film> films = filmDao.getAllFilms();
-        Integer sameUserId = searchSameUser(films,id);
-        for (Film film : films) {
-            if (film.getLikes().contains(sameUserId) && !(film.getLikes().contains(id))) {
-                recommendFilms.add(film);
-            }
+        List<Film> recommendFilm = new ArrayList<>();
+        for (Integer filmId : userDao.recommendFilmsId(id)) {
+            recommendFilm.add(filmDao.getFilmById(filmId));
         }
-            return recommendFilms;
+        return recommendFilm;
     }
 
     private User isValid(User user) {
