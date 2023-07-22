@@ -121,10 +121,10 @@ public class UserDaoImpl implements UserDao {
                 "WHERE film_id IN (SELECT distinct film_id from likes where user_id = ?) " +
                 "GROUP BY user_id " +
                 "ORDER BY COUNT(distinct film_id) DESC " +
-                "LIMIT 2", (rs , rowNum) -> {
+                "LIMIT 2", (rs, rowNum) -> {
                                             rs.getInt("COUNT(distinct film_id)");
                                             return  rs.getInt("user_id");
-                                            },id);
+                                            }, id);
     }
 
     @Override
@@ -137,6 +137,6 @@ public class UserDaoImpl implements UserDao {
                 "WHERE id in " +
                 "(SELECT distinct film_id from likes where user_id = ?) " +
                 "EXCEPT " +
-                "(SELECT distinct film_id from likes where user_id = ?)",(rs, rowNum) -> rs.getInt("id"),sameUserId.get(1), id);
+                "(SELECT distinct film_id from likes where user_id = ?)",(rs, rowNum) -> rs.getInt("id"), sameUserId.get(1), id);
     }
 }
