@@ -150,22 +150,42 @@ public class FilmDaoImpl implements FilmDao {
         return films;
     }
 
+    @Override
+    public List<Film> getCommonFilms(Integer userId, Integer friendId) {
+        List<Film> ans = new ArrayList<>();
+        List<Film> ls = jdbcTemplate.query("SELECT f.id, f.name, f.description, f.releaseDate, f.duration, f.mpa_id, mpa_ratings.name  as mpa_name,"
+                + " COUNT(l.user_id), d.name from films f left join mpa_ratings "
+                + "on mpa_ratings.id = f.mpa_id  left join likes l on l.film_id = f.id  left join film_directors as fd on fd.film_id = f.id left join directors as d on d.id = fd.director_id "
+                + "where l.user_id = ? GROUP BY f.id, f.name, "
+                + "f.description, f.releaseDate, f.duration, f.mpa_id, mpa_ratings.name ORDER BY count(l.user_id) desc, f.id desc", filmRowMapper(), userId);
+        List<Film> lsFr = jdbcTemplate.query("SELECT f.id, f.name, f.description, f.releaseDate, f.duration, f.mpa_id, mpa_ratings.name  as mpa_name,"
+                + " COUNT(l.user_id), d.name from films f left join mpa_ratings "
+                + "on mpa_ratings.id = f.mpa_id  left join likes l on l.film_id = f.id  left join film_directors as fd on fd.film_id = f.id left join directors as d on d.id = fd.director_id "
+                + "where l.user_id = ? GROUP BY f.id, f.name, "
+                + "f.description, f.releaseDate, f.duration, f.mpa_id, mpa_ratings.name ORDER BY count(l.user_id) desc, f.id desc", filmRowMapper(), friendId);
+        for (Film o : lsFr) {
+            if (ls.contains(o)) {
+                ans.add(o);
+            }
+        }
+        return ans;
+    }
+
 
     private List<Film> getFilmPr(String text, List<String> ls1) {
         if (ls1.isEmpty()) {
             throw new ValidationException("Wrong command");
         }
         if (ls1.size() == 2) {
-            return jdbcTemplate.query("SELECT f.id, f.name, f.description, f.releaseDate, f.duration, f.mpa_id," +
-                    " mpa_ratings.name  as mpa_name," +
-                    " COUNT(l.user_id), d.name from films f left join mpa_ratings " +
-                    "on mpa_ratings.id = f.mpa_id  left join likes l on l.film_id = f.id  left join film_directors as fd on fd.film_id = f.id left join directors as d on d.id = fd.director_id " +
-                    "where lower(f.name) like " +
-                    " lower('%" + text + "%') or lower(d.name) like lower('%" + text + "%') GROUP BY f.id, f.name, " +
-                    "f.description, f.releaseDate, f.duration, f.mpa_id, mpa_ratings.name ORDER BY count(l.user_id) desc, f.id desc", filmRowMapper());
+            return jdbcTemplate.query("SELECT f.id, f.name, f.description, f.releaseDate, f.duration, f.mpa_id, " +
+                    "mpa_ratings.name  as mpa_name," + " COUNT(l.user_id), d.name from films f left join mpa_ratings "
+                    + "on mpa_ratings.id = f.mpa_id  left join likes l on l.film_id = f.id  left join film_directors as fd on fd.film_id = f.id left join directors as d on d.id = fd.director_id "
+                    + "where lower(f.name) like " + " lower('%" + text + "%') or lower(d.name) like lower('%" + text + "%') GROUP BY f.id, f.name, "
+                    + "f.description, f.releaseDate, f.duration, f.mpa_id, mpa_ratings.name ORDER BY count(l.user_id) desc, f.id desc", filmRowMapper());
         } else if (ls1.get(0).equals("director")) {
             return jdbcTemplate.query("SELECT f.id, f.name, f.description, f.releaseDate, f.duration, f.mpa_id, " +
-                    " mpa_ratings.name  as mpa_name, " +
+                    " mpa_ratings.name  as" +
+                    " mpa_name, " +
                     " COUNT(l.user_id), d.name " +
                     "from films f left join mpa_ratings on mpa_ratings.id = f.mpa_id  left join likes l on l.film_id = f.id left join film_directors as fd on fd.film_id = f.id left join directors as d on d.id = fd.director_id  " +
                     " where  lower(d.name) like lower('%" + text + "%') GROUP BY f.id, f.name, f.description, f.releaseDate, " +
