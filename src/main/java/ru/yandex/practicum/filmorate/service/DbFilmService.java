@@ -96,11 +96,7 @@ public class DbFilmService implements FilmService {
 
     @Override
     public List<Film> getFilmsSearch(String text, List<String> ls) {
-        try {
-            return filmDao.getFilmsSearch(text, ls);
-        } catch (Exception e) {
-            throw new ValidationException(e.getMessage());
-        }
+        return filmDao.getFilmsSearch(text, ls);
     }
 
     private Film isValid(Film film) {

@@ -155,7 +155,7 @@ public class FilmDaoImpl implements FilmDao {
         if (ls1.isEmpty()) {
             throw new ValidationException("Wrong command");
         }
-        if (ls1.size() == 2 && ls1.get(0).equals("title") && ls1.get(1).equals("director")) {
+        if ((ls1.size() == 2 && ls1.get(0).equals("title") && ls1.get(1).equals("director")) || (ls1.size() == 2 && ls1.get(0).equals("director") && ls1.get(1).equals("title"))) {
             return jdbcTemplate.query("SELECT f.id, f.name, f.description, f.releaseDate, f.duration, f.mpa_id," +
                     " mpa_ratings.name  as mpa_name," +
                     " COUNT(l.user_id) from films f left join mpa_ratings " +
