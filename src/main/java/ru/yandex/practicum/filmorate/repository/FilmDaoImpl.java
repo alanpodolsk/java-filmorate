@@ -25,8 +25,12 @@ public class FilmDaoImpl implements FilmDao {
 
     @Override
     public Film addFilm(Film film) {
-        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate.getDataSource()).withTableName("films").usingGeneratedKeyColumns("id");
-        Map<String, String> params = Map.of("name", film.getName(), "description", film.getDescription(), "releaseDate", film.getReleaseDate().toString(), "duration", film.getDuration().toString(), "mpa_id", film.getMpa().getId().toString());
+        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate.getDataSource())
+                .withTableName("films").usingGeneratedKeyColumns("id");
+        Map<String, String> params = Map.of("name", film.getName(), "description",
+                film.getDescription(), "releaseDate", film.getReleaseDate().toString(),
+                "duration", film.getDuration().toString(),
+                "mpa_id", film.getMpa().getId().toString());
         Number id = simpleJdbcInsert.executeAndReturnKey(params);
         film.setId((Integer) id);
 
@@ -44,8 +48,10 @@ public class FilmDaoImpl implements FilmDao {
 
     @Override
     public Film updateFilm(Film film) {
-        String sqlQuery = "UPDATE films SET name = ?, description = ?, releaseDate = ?, duration = ?, mpa_id = ? WHERE id = ?";
-        jdbcTemplate.update(sqlQuery, film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(), film.getMpa().getId(), film.getId());
+        String sqlQuery = "UPDATE films SET name = ?, description = ?, releaseDate = ?, "
+                + "duration = ?, mpa_id = ? WHERE id = ?";
+        jdbcTemplate.update(sqlQuery, film.getName(), film.getDescription(),
+                film.getReleaseDate(), film.getDuration(), film.getMpa().getId(), film.getId());
 
         String sqlQueryGenres = "DELETE FROM films_genres WHERE film_id = ?";
         jdbcTemplate.update(sqlQueryGenres, film.getId());
@@ -62,7 +68,10 @@ public class FilmDaoImpl implements FilmDao {
     @Override
     public List<Film> getAllFilms() {
 
-        List<Film> films = jdbcTemplate.query("SELECT f.id, f.name, f.description, f.releaseDate, f.duration, " + "f.mpa_id, mpa_ratings.name as mpa_name from films f left join mpa_ratings on mpa_ratings.id = f.mpa_id ORDER BY f.id ASC", filmRowMapper());
+        List<Film> films = jdbcTemplate.query("SELECT f.id, f.name, f.description, "
+                + "f.releaseDate, f.duration, f.mpa_id, mpa_ratings.name as mpa_name "
+                + "from films f left join mpa_ratings on mpa_ratings.id = f.mpa_id "
+                + "ORDER BY f.id ASC", filmRowMapper());
         Map<Integer, Film> filmMap = new HashMap<>();
         for (Film film : films) {
             filmMap.put(film.getId(), film);
@@ -75,7 +84,10 @@ public class FilmDaoImpl implements FilmDao {
 
     @Override
     public Film getFilmById(Integer filmId) {
-        List<Film> films = jdbcTemplate.query("SELECT f.id, f.name, f.description, f.releaseDate, f.duration, " + "f.mpa_id, mpa_ratings.name as mpa_name from films f left join mpa_ratings on mpa_ratings.id = f.mpa_id WHERE f.id = ? ORDER BY f.id ASC", filmRowMapper(), filmId);
+        List<Film> films = jdbcTemplate.query("SELECT f.id, f.name, f.description, "
+                + "f.releaseDate, f.duration, f.mpa_id, mpa_ratings.name as mpa_name "
+                + "from films f left join mpa_ratings on mpa_ratings.id = f.mpa_id "
+                + "WHERE f.id = ? ORDER BY f.id ASC", filmRowMapper(), filmId);
         if (films.size() != 1) {
             return null;
         }
@@ -90,7 +102,8 @@ public class FilmDaoImpl implements FilmDao {
 
     @Override
     public List<Integer> getLikes(Integer filmId) {
-        return jdbcTemplate.query("SELECT user_id From likes where film_id = ?", (rs, rowNum) -> {
+        return jdbcTemplate.query("SELECT user_id From likes where film_id = ?",
+                (rs, rowNum) -> {
             return rs.getInt("user_id");
         }, filmId);
     }
@@ -108,11 +121,45 @@ public class FilmDaoImpl implements FilmDao {
     }
 
     @Override
-    public List<Film> getPopularFilms(Integer count) {
-        List<Film> films = jdbcTemplate.query("SELECT f.id, f.name, f.description, f.releaseDate, f.duration," +
-                " f.mpa_id, mpa_ratings.name  as mpa_name, COUNT(l.user_id)" +
-                " from films f left join mpa_ratings on mpa_ratings.id = f.mpa_id left join likes l on l.film_id = f.id " +
-                "GROUP BY f.id, f.name, f.description, f.releaseDate, f.duration, f.mpa_id, mpa_ratings.name ORDER BY f.id DESC LIMIT ?", filmRowMapper(), count);
+    public List<Film> getPopularFilms(Integer count, Integer genreId, Integer year)  {
+        String sqlQuery;
+        List<Film> films;
+        StringBuilder sbWithoutGenres = new StringBuilder("SELECT f.id, f.name, f.description, "
+                + "f.releaseDate, f.duration, f.mpa_id, mpa_ratings.name  as mpa_name, "
+                + "COUNT(l.user_id) from films f "
+                + "left join mpa_ratings on mpa_ratings.id = f.mpa_id "
+                + "left join likes l on l.film_id = f.id "
+                + "GROUP BY f.id, f.name, f.description, f.releaseDate, f.duration, "
+                + "f.mpa_id, mpa_ratings.name ");
+        StringBuilder sbWithGenres = new StringBuilder("SELECT f.id, f.name, f.description, "
+                + "f.releaseDate, f.duration, f.mpa_id, mpa_ratings.name as mpa_name, fg.genre_id, "
+                + "COUNT(l.user_id) from films f "
+                + "left join mpa_ratings on mpa_ratings.id = f.mpa_id "
+                + "left join likes l on l.film_id = f.id "
+                + "left join films_genres fg on fg.film_id = f.id "
+                + "GROUP BY f.id, f.name, f.description, f.releaseDate, f.duration, "
+                + "f.mpa_id, mpa_ratings.name, fg.genre_id ");
+        String orderAndLimit = "ORDER BY f.id DESC LIMIT ?";
+        if (genreId == null & year == null) {
+            sbWithoutGenres.append(orderAndLimit);
+            sqlQuery = sbWithoutGenres.toString();
+            films = jdbcTemplate.query(sqlQuery, filmRowMapper(), count);
+        } else if (genreId == null) {
+            sbWithoutGenres.append("HAVING EXTRACT (YEAR FROM f.releaseDate) = ? ")
+                    .append(orderAndLimit);
+            sqlQuery = sbWithoutGenres.toString();
+            films = jdbcTemplate.query(sqlQuery, filmRowMapper(), year, count);
+        } else if (year == null) {
+            sbWithGenres.append("HAVING fg.genre_id = ? ")
+                    .append(orderAndLimit);
+            sqlQuery = sbWithGenres.toString();
+            films = jdbcTemplate.query(sqlQuery, filmRowMapper(), genreId, count);
+        } else {
+            sbWithGenres.append("HAVING fg.genre_id = ? and EXTRACT (YEAR FROM f.releaseDate) = ? ")
+                    .append(orderAndLimit);
+            sqlQuery = sbWithGenres.toString();
+            films = jdbcTemplate.query(sqlQuery, filmRowMapper(), genreId, year, count);
+        }
         Map<Integer, Film> filmMap = new HashMap<>();
         for (Film film : films) {
             filmMap.put(film.getId(), film);

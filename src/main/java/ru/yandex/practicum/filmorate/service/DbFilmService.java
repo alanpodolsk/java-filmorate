@@ -77,8 +77,8 @@ public class DbFilmService implements FilmService {
     }
 
     @Override
-    public List<Film> getPopularFilms(Integer count) {
-        return filmDao.getPopularFilms(count);
+    public List<Film> getPopularFilms(Integer count, Integer genreId, Integer year) {
+        return filmDao.getPopularFilms(count, genreId, year);
     }
 
     @Override

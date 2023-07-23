@@ -190,7 +190,7 @@ class FilmControllerTest {
         //Act
         filmController.addLike(1, 1);
         //Assert
-        assertArrayEquals(new Film[]{filmController.getFilm(2), filmController.getFilm(1)}, filmController.getPopularFilms(10).toArray(), "Возвращен некорректный список фильмов");
+        assertArrayEquals(new Film[]{filmController.getFilm(2), filmController.getFilm(1)}, filmController.getPopularFilms(10, 1, 1999).toArray(), "Возвращен некорректный список фильмов");
     }
 
     @Test

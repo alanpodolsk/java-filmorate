@@ -81,7 +81,7 @@ public class InMemoryFilmService implements FilmService {
     }
 
     @Override
-    public List<Film> getPopularFilms(Integer count) {
+    public List<Film> getPopularFilms(Integer count, Integer genreId, Integer year) {
         List<Film> films = filmStorage.getAllFilms();
         return films.stream().sorted((p0, p1) -> {
                     int comp = -1 * Integer.valueOf(p0.getLikes().size()).compareTo(p1.getLikes().size());
