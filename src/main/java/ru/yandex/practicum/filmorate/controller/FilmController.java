@@ -60,5 +60,10 @@ public class FilmController {
                                         @RequestParam(defaultValue = "likes") String sortBy) {
         return filmService.getFilmsByDirector(directorId, sortBy);
     }
+
+    @GetMapping("/search")
+    public List<Film> getFilmSearch(@RequestParam(value = "query") String query, @RequestParam(value = "by", required = false) List<String> by) {
+        return filmService.getFilmsSearch(query, by);
+    }
 }
 
