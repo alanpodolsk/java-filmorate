@@ -109,11 +109,11 @@ public class DbFilmService implements FilmService {
         if (userDao.getUserById(friendId) == null) {
             throw new NoObjectException("Данный друг отсутствует в базе");
         }
-        List<Film> ls = filmDao.getCommonFilms(userId, friendId);
-        if (ls == null) {
+        List<Film> films = filmDao.getCommonFilms(userId, friendId);
+        if (films == null) {
             return new ArrayList<>();
         }
-        return ls;
+        return films;
     }
 
     @Override
