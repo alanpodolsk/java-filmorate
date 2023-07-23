@@ -103,11 +103,11 @@ public class DbUserService implements UserService {
 
     @Override
     public List<Film> recommendFilms(Integer id) {
-        List<Film> recommendFilm = new ArrayList<>();
-        for (Integer filmId : userDao.recommendFilmsId(id)) {
-            recommendFilm.add(filmDao.getFilmById(filmId));
+        List<Integer> sameUserId = userDao.searchSameUser(id);
+        if (sameUserId.size() < 2) {
+            return new ArrayList<>();
         }
-        return recommendFilm;
+        return filmDao.getRecomendFilms(id, sameUserId.get(1));
     }
 
     private User isValid(User user) {

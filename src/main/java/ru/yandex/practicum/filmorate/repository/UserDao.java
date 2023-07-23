@@ -23,5 +23,5 @@ public interface UserDao {
 
     public List<User> getMutualFriends(Integer userId, Integer otherUserId);
 
-    public List<Integer> recommendFilmsId(Integer id);
+    public List<Integer> searchSameUser(Integer id);
 }
