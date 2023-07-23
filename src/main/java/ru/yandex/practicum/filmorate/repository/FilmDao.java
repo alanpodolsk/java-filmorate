@@ -28,6 +28,6 @@ public interface FilmDao {
     List<Film> getFilmsSearch(String text, List<String> ls);
 
     List<Film> getCommonFilms(Integer userId, Integer friendId);
-  
+
     public List<Film> getRecomendFilms(Integer id, Integer sameUserId);
 }
