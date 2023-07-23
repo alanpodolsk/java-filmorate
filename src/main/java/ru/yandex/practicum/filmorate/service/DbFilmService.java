@@ -93,14 +93,21 @@ public class DbFilmService implements FilmService {
         return filmDao.getFilmsByDirector(directorId, sortBy);
     }
 
+    @Override
+    public List<Film> getCommonFilms(Integer userId, Integer friendId) {
+        if (filmDao.getFilmById(userId) == null) {
+            throw new NoObjectException("Данный пользователь отсутствует в базе");
+        }
+        if (filmDao.getFilmById(friendId) == null) {
+            throw new NoObjectException("Данный друг отсутствует в базе");
+        }
+        return filmDao.getCommonFilms(userId, friendId);
+    }
+
 
     @Override
     public List<Film> getFilmsSearch(String text, List<String> ls) {
-        try {
-            return filmDao.getFilmsSearch(text, ls);
-        } catch (Exception e) {
-            throw new ValidationException(e.getMessage());
-        }
+        return filmDao.getFilmsSearch(text, ls);
     }
 
     private Film isValid(Film film) {
