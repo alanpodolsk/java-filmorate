@@ -29,6 +29,7 @@ class FilmorateApplicationTests {
     private final FilmDao filmDao;
     private final GenreDao genreDao;
     private final MPADao mpaDao;
+
     private final DirectorDao directorDao;
 
     Director director1 = new Director(null, "Director");
