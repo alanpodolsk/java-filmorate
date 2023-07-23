@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -140,9 +141,53 @@ public class FilmDaoImpl implements FilmDao {
         }
         setGenres(filmMap);
         setDirectors(filmMap);
-
         return films;
     }
+
+    @Override
+    public List<Film> getFilmsSearch(String text, List<String> lsFilm1) {
+        List<Film> films = getFilmPr(text, lsFilm1);
+        Map<Integer, Film> filmMap = new HashMap<>();
+        for (Film film : films) {
+            filmMap.put(film.getId(), film);
+        }
+        setDirectors(filmMap);
+        setGenres(filmMap);
+        return films;
+    }
+
+
+    private List<Film> getFilmPr(String text, List<String> ls1) {
+        if (ls1.isEmpty()) {
+            throw new ValidationException("Wrong command");
+        }
+        if ((ls1.size() == 2 && ls1.get(0).equals("title") && ls1.get(1).equals("director")) || (ls1.size() == 2 && ls1.get(0).equals("director") && ls1.get(1).equals("title"))) {
+            return jdbcTemplate.query("SELECT f.id, f.name, f.description, f.releaseDate, f.duration, f.mpa_id," +
+                    " mpa_ratings.name  as mpa_name," +
+                    " COUNT(l.user_id) from films f left join mpa_ratings " +
+                    "on mpa_ratings.id = f.mpa_id  left join likes l on l.film_id = f.id  left join film_directors as fd on fd.film_id = f.id left join directors as d on d.id = fd.director_id " +
+                    "where lower(f.name) like " +
+                    " lower(?) or lower(d.name) like lower(?) GROUP BY f.id, f.name, " +
+                    "f.description, f.releaseDate, f.duration, f.mpa_id, mpa_ratings.name ORDER BY count(l.user_id) desc, f.id desc", filmRowMapper(), "%" + text + "%", "%" + text + "%");
+        } else if (ls1.get(0).equals("director")) {
+            return jdbcTemplate.query("SELECT f.id, f.name, f.description, f.releaseDate, f.duration, f.mpa_id, " +
+                    " mpa_ratings.name  as mpa_name, " +
+                    " COUNT(l.user_id) " +
+                    "from films f left join mpa_ratings on mpa_ratings.id = f.mpa_id  left join likes l on l.film_id = f.id left join film_directors as fd on fd.film_id = f.id left join directors as d on d.id = fd.director_id  " +
+                    " where  lower(d.name) like lower(?) GROUP BY f.id, f.name, f.description, f.releaseDate, " +
+                    " f.duration, f.mpa_id, mpa_ratings.name ORDER BY count(l.user_id) desc, f.id desc ", filmRowMapper(), "%" + text + "%");
+        } else if (ls1.get(0).equals("title")) {
+            return jdbcTemplate.query("SELECT f.id, f.name, f.description, f.releaseDate, f.duration, f.mpa_id, " +
+                    " mpa_ratings.name  as mpa_name, " +
+                    " COUNT(l.user_id) from films f left join mpa_ratings on mpa_ratings.id = f.mpa_id  " +
+                    " left join likes l on l.film_id = f.id   " +
+                    " where lower(f.name) like lower(?) " +
+                    " GROUP BY f.id, f.name, f.description, f.releaseDate, f.duration, f.mpa_id, mpa_ratings.name ORDER BY count(l.user_id) desc, f.id desc", filmRowMapper(), "%" + text + "%");
+        } else {
+            throw new ValidationException("Wrong command");
+        }
+    }
+
 
     private RowMapper<Film> filmRowMapper() {
         return (rs, rowNum) -> {
@@ -173,7 +218,7 @@ public class FilmDaoImpl implements FilmDao {
     private void insertDirectors(Film film) {
         String sqlSubQueryDirectors = "INSERT INTO film_directors (film_id, director_id) VALUES (?, ?)";
         if (film.getDirectors() != null) {
-            for (Director director: film.getDirectors()) {
+            for (Director director : film.getDirectors()) {
                 jdbcTemplate.update(sqlSubQueryDirectors, film.getId(), director.getId());
             }
         }
