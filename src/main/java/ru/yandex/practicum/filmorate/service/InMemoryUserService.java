@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NoObjectException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -146,5 +147,10 @@ public class InMemoryUserService implements UserService {
             }
         }
         return mutualFriends;
+    }
+
+    @Override
+    public List<Film> recommendFilms(Integer id) {
+        return null;
     }
 }

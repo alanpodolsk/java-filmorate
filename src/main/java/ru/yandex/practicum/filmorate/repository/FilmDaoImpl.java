@@ -254,5 +254,21 @@ public class FilmDaoImpl implements FilmDao {
             return film.getDirectors().add(new Director(rs.getInt("id"), rs.getString("name")));
         });
     }
+
+    @Override
+    public List<Film> getRecomendFilms(Integer id, Integer sameUserId) {
+        List<Film> films = jdbcTemplate.query("SELECT f.id, f.name, f.description, f.releaseDate, f.duration, " +
+                "f.mpa_id, mpa_ratings.name as mpa_name from films f left join mpa_ratings on mpa_ratings.id = f.mpa_id  WHERE f.id in \n" +
+                "(SELECT distinct film_id from likes where user_id = ? \n" +
+                " EXCEPT \n" +
+                " SELECT distinct film_id from likes where user_id = ?)\n", filmRowMapper(), sameUserId, id);
+        Map<Integer, Film> filmMap = new HashMap<>();
+        for (Film film : films) {
+            filmMap.put(film.getId(), film);
+        }
+        setGenres(filmMap);
+        setDirectors(filmMap);
+        return films;
+    }
 }
 

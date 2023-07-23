@@ -22,4 +22,6 @@ public interface UserDao {
     public List<User> getFriendsById(Integer id);
 
     public List<User> getMutualFriends(Integer userId, Integer otherUserId);
+
+    public List<Integer> searchSameUser(Integer id);
 }
