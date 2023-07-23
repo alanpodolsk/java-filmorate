@@ -17,7 +17,11 @@ public interface UserDao {
 
     public User addUser(User user);
 
+    public void deleteUser(Integer userId);
+
     public List<User> getFriendsById(Integer id);
 
     public List<User> getMutualFriends(Integer userId, Integer otherUserId);
+
+    public List<Integer> searchSameUser(Integer id);
 }

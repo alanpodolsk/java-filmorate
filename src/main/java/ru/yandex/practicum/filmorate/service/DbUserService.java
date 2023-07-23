@@ -5,23 +5,32 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NoObjectException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.repository.FilmDao;
 import ru.yandex.practicum.filmorate.repository.UserDao;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 @Service
 @Primary
 @AllArgsConstructor
 public class DbUserService implements UserService {
     private UserDao userDao;
+    private FilmDao filmDao;
 
     @Override
     public User addUser(User user) {
         isValid(user);
         return userDao.addUser(user);
+    }
+
+    @Override
+    public void deleteUser(Integer userId) {
+        if (userId > 0 || userDao.getUserById(userId) != null) {
+            userDao.deleteUser(userId);
+        }
     }
 
     @Override
@@ -90,6 +99,15 @@ public class DbUserService implements UserService {
         } else {
             return user;
         }
+    }
+
+    @Override
+    public List<Film> recommendFilms(Integer id) {
+        List<Integer> sameUserId = userDao.searchSameUser(id);
+        if (sameUserId.size() < 2) {
+            return new ArrayList<>();
+        }
+        return filmDao.getRecomendFilms(id, sameUserId.get(1));
     }
 
     private User isValid(User user) {

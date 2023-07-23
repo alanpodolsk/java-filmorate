@@ -38,6 +38,12 @@ public class FilmDaoImpl implements FilmDao {
     }
 
     @Override
+    public void deleteFilm(Integer filmId) {
+        String sqlQuery = "DELETE FROM films WHERE id = ?";
+        jdbcTemplate.update(sqlQuery, filmId);
+    }
+
+    @Override
     public Film updateFilm(Film film) {
         String sqlQuery = "UPDATE films SET name = ?, description = ?, releaseDate = ?, duration = ?, mpa_id = ? WHERE id = ?";
         jdbcTemplate.update(sqlQuery, film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(), film.getMpa().getId(), film.getId());
@@ -167,7 +173,6 @@ public class FilmDaoImpl implements FilmDao {
         return ls;
     }
 
-
     private List<Film> getFilmPr(String text, List<String> ls1) {
         if (ls1.isEmpty()) {
             throw new ValidationException("Wrong command");
@@ -264,6 +269,22 @@ public class FilmDaoImpl implements FilmDao {
             Film film = films.get(rs.getInt("film_id"));
             return film.getDirectors().add(new Director(rs.getInt("id"), rs.getString("name")));
         });
+    }
+
+    @Override
+    public List<Film> getRecomendFilms(Integer id, Integer sameUserId) {
+        List<Film> films = jdbcTemplate.query("SELECT f.id, f.name, f.description, f.releaseDate, f.duration, " +
+                "f.mpa_id, mpa_ratings.name as mpa_name from films f left join mpa_ratings on mpa_ratings.id = f.mpa_id  WHERE f.id in \n" +
+                "(SELECT distinct film_id from likes where user_id = ? \n" +
+                " EXCEPT \n" +
+                " SELECT distinct film_id from likes where user_id = ?)\n", filmRowMapper(), sameUserId, id);
+        Map<Integer, Film> filmMap = new HashMap<>();
+        for (Film film : films) {
+            filmMap.put(film.getId(), film);
+        }
+        setGenres(filmMap);
+        setDirectors(filmMap);
+        return films;
     }
 }
 

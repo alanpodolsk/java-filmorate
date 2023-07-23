@@ -30,6 +30,13 @@ public class DbFilmService implements FilmService {
     }
 
     @Override
+    public void deleteFilm(Integer filmId) {
+        if (filmId > 0 || filmDao.getFilmById(filmId) != null) {
+            filmDao.deleteFilm(filmId);
+        }
+    }
+
+    @Override
     public Film updateFilm(Film film) {
         isValid(film);
         if (filmDao.getFilmById(film.getId()) == null) {
@@ -103,7 +110,6 @@ public class DbFilmService implements FilmService {
         }
         return filmDao.getCommonFilms(userId, friendId);
     }
-
 
     @Override
     public List<Film> getFilmsSearch(String text, List<String> ls) {
