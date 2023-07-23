@@ -124,7 +124,7 @@ public class FilmDaoImpl implements FilmDao {
     public List<Film> getPopularFilms(Integer count, Integer genreId, Integer year)  {
         String sqlQuery;
         List<Film> films;
-        StringBuilder sbWithoutGenres = new StringBuilder("SELECT f.id, f.name, f.description, "
+        StringBuilder sbWithoutConditions = new StringBuilder("SELECT f.id, f.name, f.description, "
                 + "f.releaseDate, f.duration, f.mpa_id, mpa_ratings.name  as mpa_name, "
                 + "COUNT(l.user_id) from films f "
                 + "left join mpa_ratings on mpa_ratings.id = f.mpa_id "
@@ -141,13 +141,13 @@ public class FilmDaoImpl implements FilmDao {
                 + "f.mpa_id, mpa_ratings.name, fg.genre_id ");
         String orderAndLimit = "ORDER BY f.id DESC LIMIT ?";
         if (genreId == null & year == null) {
-            sbWithoutGenres.append(orderAndLimit);
-            sqlQuery = sbWithoutGenres.toString();
+            sbWithoutConditions.append(orderAndLimit);
+            sqlQuery = sbWithoutConditions.toString();
             films = jdbcTemplate.query(sqlQuery, filmRowMapper(), count);
         } else if (genreId == null) {
-            sbWithoutGenres.append("HAVING EXTRACT (YEAR FROM f.releaseDate) = ? ")
+            sbWithoutConditions.append("HAVING EXTRACT (YEAR FROM f.releaseDate) = ? ")
                     .append(orderAndLimit);
-            sqlQuery = sbWithoutGenres.toString();
+            sqlQuery = sbWithoutConditions.toString();
             films = jdbcTemplate.query(sqlQuery, filmRowMapper(), year, count);
         } else if (year == null) {
             sbWithGenres.append("HAVING fg.genre_id = ? ")
