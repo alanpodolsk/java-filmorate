@@ -15,11 +15,8 @@ public interface ReviewService {
 
     List<Review> getAllReviews(Integer filmId, Integer count);
 
-    Review addLikeToReview(Integer id, Integer userId);
+    Review increaseReviewUseful(Integer id, Integer userId);
 
-    Review addDislikeToReview(Integer id, Integer userId);
+    Review reduceReviewUseful(Integer id, Integer userId);
 
-    Review deleteLikeFromReview(Integer id, Integer userId);
-
-    Review deleteDislikeFromReview(Integer id, Integer userId);
 }

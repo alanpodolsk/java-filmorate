@@ -10,7 +10,6 @@ import ru.yandex.practicum.filmorate.model.Review;
 
 import java.sql.PreparedStatement;
 import java.util.List;
-import java.util.Objects;
 
 @Component
 @AllArgsConstructor
@@ -20,7 +19,7 @@ public class ReviewDaoImpl implements ReviewDao {
     @Override
     public Review addReview(Review review) {
         String sqlQuery = "INSERT INTO reviews (is_positive, content, user_id, film_id, useful) " +
-                "values (?, ?, ?,?,?)";
+                "values (?, ?, ?,?,0)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[]{"id"});
@@ -28,10 +27,9 @@ public class ReviewDaoImpl implements ReviewDao {
             stmt.setString(2, review.getContent());
             stmt.setInt(3, review.getUserId());
             stmt.setInt(4, review.getFilmId());
-            stmt.setInt(5, review.getUseful());
             return stmt;
         }, keyHolder);
-        int id = Objects.requireNonNull(keyHolder.getKey().intValue());
+        int id = keyHolder.getKey().intValue();
         review.setReviewId(id);
         return review;
     }
@@ -65,9 +63,8 @@ public class ReviewDaoImpl implements ReviewDao {
         List<Review> reviews = jdbcTemplate.query(sqlQuery, reviewRowMapper(), id);
         if (reviews.size() != 1) {
             return null;
-        } else {
-            return reviews.get(0);
         }
+        return reviews.get(0);
     }
 
     @Override
@@ -76,10 +73,9 @@ public class ReviewDaoImpl implements ReviewDao {
         if (filmId == null) {
             sqlQuery = "SELECT id, is_positive, content, user_id, film_id, useful FROM reviews ORDER BY useful DESC LIMIT ?";
             return jdbcTemplate.query(sqlQuery, reviewRowMapper(), count);
-        } else {
-            sqlQuery = "SELECT id, is_positive, content, user_id, film_id, useful FROM reviews WHERE film_id = ? ORDER BY useful DESC LIMIT ?";
-            return jdbcTemplate.query(sqlQuery, reviewRowMapper(), filmId, count);
         }
+        sqlQuery = "SELECT id, is_positive, content, user_id, film_id, useful FROM reviews WHERE film_id = ? ORDER BY useful DESC LIMIT ?";
+        return jdbcTemplate.query(sqlQuery, reviewRowMapper(), filmId, count);
     }
 
     private RowMapper<Review> reviewRowMapper() {

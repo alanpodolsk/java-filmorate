@@ -44,9 +44,8 @@ public class DbReviewService implements ReviewService {
         Review review = reviewDao.getReviewById(id);
         if (review == null) {
             throw new NoObjectException("Отзыв с id = " + id + " не найден в базе");
-        } else {
-            return review;
         }
+        return review;
     }
 
     @Override
@@ -55,7 +54,7 @@ public class DbReviewService implements ReviewService {
     }
 
     @Override
-    public Review addLikeToReview(Integer id, Integer userId) {
+    public Review increaseReviewUseful(Integer id, Integer userId) {
         Review review = reviewDao.getReviewById(id);
         if (review == null) {
             throw new NoObjectException("Отзыв не найден в БД");
@@ -66,7 +65,7 @@ public class DbReviewService implements ReviewService {
     }
 
     @Override
-    public Review addDislikeToReview(Integer id, Integer userId) {
+    public Review reduceReviewUseful(Integer id, Integer userId) {
         Review review = reviewDao.getReviewById(id);
         if (review == null) {
             throw new NoObjectException("Отзыв не найден в БД");
@@ -76,46 +75,27 @@ public class DbReviewService implements ReviewService {
         return reviewDao.updateUseful(id, review.getUseful() - 1);
     }
 
-    @Override
-    public Review deleteLikeFromReview(Integer id, Integer userId) {
-        Review review = reviewDao.getReviewById(id);
-        if (review == null) {
-            throw new NoObjectException("Отзыв не найден в БД");
-        } else if (userService.getUser(userId) == null) {
-            throw new ValidationException("Невозможно удалить лайк - пользователь не найден в БД");
-        }
-        return reviewDao.updateUseful(id, review.getUseful() - 1);
-    }
-
-    @Override
-    public Review deleteDislikeFromReview(Integer id, Integer userId) {
-        Review review = reviewDao.getReviewById(id);
-        if (review == null) {
-            throw new NoObjectException("Отзыв не найден в БД");
-        } else if (userService.getUser(userId) == null) {
-            throw new ValidationException("Невозможно удалить дизлайк - пользователь не найден в БД");
-        }
-        return reviewDao.updateUseful(id, review.getUseful() + 1);
-    }
-
     private Review isValid(Review review) {
         if (review == null) {
             throw new ValidationException("Передан пустой объект отзыва");
-        } else if (review.getIsPositive() == null) {
-            throw new ValidationException("Не указан тип отзыва");
-        } else if (review.getContent() == null || review.getContent().isBlank()) {
-            throw new ValidationException("Пустое содержимое отзыва");
-        } else if (review.getUserId() == null) {
-            throw new ValidationException("Не указан создавший пользователь");
-        } else if (review.getFilmId() == null) {
-            throw new ValidationException("Не указан фильм, о котором оставлен отзыв");
-        } else if (filmService.getFilm(review.getFilmId()) == null) {
-            throw new ValidationException("Указанный фильм не найден в БД");
-        } else if (userService.getUser(review.getUserId()) == null) {
-            throw new ValidationException("Указанный пользователь не найден в БД");
         }
-        if (review.getUseful() == null) {
-            review.setUseful(0);
+        if (review.getIsPositive() == null) {
+            throw new ValidationException("Не указан тип отзыва");
+        }
+        if (review.getContent() == null || review.getContent().isBlank()) {
+            throw new ValidationException("Пустое содержимое отзыва");
+        }
+        if (review.getUserId() == null) {
+            throw new ValidationException("Не указан создавший пользователь");
+        }
+        if (review.getFilmId() == null) {
+            throw new ValidationException("Не указан фильм, о котором оставлен отзыв");
+        }
+        if (filmService.getFilm(review.getFilmId()) == null) {
+            throw new ValidationException("Указанный фильм не найден в БД");
+        }
+        if (userService.getUser(review.getUserId()) == null) {
+            throw new ValidationException("Указанный пользователь не найден в БД");
         }
         return review;
     }
