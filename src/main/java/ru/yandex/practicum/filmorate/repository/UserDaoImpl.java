@@ -39,6 +39,14 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
+    public void deleteUser(Integer userId) {
+        String sqlQueryDeleteFriends = "DELETE FROM friends WHERE friend_id = ?";
+        String sqlQueryDeleteUser = "DELETE FROM users WHERE id = ?";
+        jdbcTemplate.update(sqlQueryDeleteFriends, userId);
+        jdbcTemplate.update(sqlQueryDeleteUser, userId);
+    }
+
+    @Override
     public List<User> getFriendsById(Integer id) {
         return jdbcTemplate.query("SELECT u.id, u.name, u.email, u.login, u.birthday from users u WHERE u.id in (SELECT friend_id from friends WHERE user_id = ?)", userRowMapper(), id);
     }
@@ -114,5 +122,17 @@ public class UserDaoImpl implements UserDao {
 
     private List<Integer> getFriendsIds(Integer id) {
         return jdbcTemplate.query("SELECT friend_id From friends where user_id = ?", (rs, rowNum) -> rs.getInt("friend_id"), id);
+    }
+
+    @Override
+    public List<Integer> searchSameUser(Integer id) {
+        return jdbcTemplate.query("SELECT user_id,COUNT(distinct film_id) from likes " +
+                "WHERE film_id IN (SELECT distinct film_id from likes where user_id = ?) " +
+                "GROUP BY user_id " +
+                "ORDER BY COUNT(distinct film_id) DESC " +
+                "LIMIT 2", (rs, rowNum) -> {
+                                            rs.getInt("COUNT(distinct film_id)");
+                                            return  rs.getInt("user_id");
+                                            }, id);
     }
 }

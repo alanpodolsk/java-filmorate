@@ -26,6 +26,10 @@ public class InMemoryFilmService implements FilmService {
     }
 
     @Override
+    public void deleteFilm(Integer filmId) {
+    }
+
+    @Override
     public Film updateFilm(Film film) {
         isValid(film);
         if (film.getId() == null || filmStorage.getFilm(film.getId()) == null) {

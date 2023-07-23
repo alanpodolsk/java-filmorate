@@ -7,6 +7,8 @@ import java.util.List;
 public interface FilmDao {
     public Film addFilm(Film film);
 
+    public void deleteFilm(Integer filmId);
+
     public Film updateFilm(Film film);
 
     public List<Film> getAllFilms();
@@ -26,4 +28,6 @@ public interface FilmDao {
     List<Film> getFilmsSearch(String text, List<String> ls);
 
     List<Film> getCommonFilms(Integer userId, Integer friendId);
+
+    public List<Film> getRecomendFilms(Integer id, Integer sameUserId);
 }
