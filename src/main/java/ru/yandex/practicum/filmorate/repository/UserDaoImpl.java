@@ -152,6 +152,7 @@ public class UserDaoImpl implements UserDao {
             return event;
         };
     }
+    
     private List<Integer> getFriendsIds(Integer id) {
         return jdbcTemplate.query("SELECT friend_id From friends where user_id = ?", (rs, rowNum) -> rs.getInt("friend_id"), id);
     }
