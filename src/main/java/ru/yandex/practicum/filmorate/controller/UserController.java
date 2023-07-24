@@ -67,7 +67,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}/feed")
-    public List<Event> getEventsList (@PathVariable Integer id) {
+    public List<Event> getEventsList(@PathVariable Integer id) {
         return userService.getEventsList(id);
     }
 }
