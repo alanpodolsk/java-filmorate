@@ -115,6 +115,7 @@ public class DbUserService implements UserService {
     public List<Event> getEventsList(Integer id) {
         return userDao.getEventsList(id);
     }
+
     private User isValid(User user) {
         if (user == null) {
             throw new ValidationException("Передан пустой объект пользователя");
