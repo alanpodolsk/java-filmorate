@@ -21,7 +21,7 @@ public interface FilmService {
 
     public Film getFilm(Integer id);
 
+    List<Film> getFilmsSearch(String text, List<String> ls);
+
     List<Film> getFilmsByDirector(Integer directorId, String sortBy);
 }
-
-

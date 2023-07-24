@@ -100,6 +100,12 @@ public class DbFilmService implements FilmService {
         return filmDao.getFilmsByDirector(directorId, sortBy);
     }
 
+
+    @Override
+    public List<Film> getFilmsSearch(String text, List<String> ls) {
+        return filmDao.getFilmsSearch(text, ls);
+    }
+
     private Film isValid(Film film) {
         if (film == null) {
             throw new ValidationException("Передан пустой объект фильма");

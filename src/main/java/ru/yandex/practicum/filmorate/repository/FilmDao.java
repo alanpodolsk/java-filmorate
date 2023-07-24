@@ -24,4 +24,8 @@ public interface FilmDao {
     public List<Film> getPopularFilms(Integer count, Integer genreId, Integer year);
 
     List<Film> getFilmsByDirector(Integer directorId, String sortBy);
+
+    public List<Film> getRecomendFilms(Integer id, Integer sameUserId);
+
+    List<Film> getFilmsSearch(String text, List<String> ls);
 }

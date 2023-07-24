@@ -20,6 +20,6 @@ public class Film {
     Integer duration;
     Set<Integer> likes;
     Set<Genre> genres;
-    final Set<Director> directors = new HashSet<>();
+    Set<Director> directors = new HashSet<>();
     MPA mpa;
 }
