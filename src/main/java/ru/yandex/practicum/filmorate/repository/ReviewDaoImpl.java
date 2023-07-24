@@ -9,6 +9,8 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Review;
 
 import java.sql.PreparedStatement;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 
 @Component
@@ -31,6 +33,14 @@ public class ReviewDaoImpl implements ReviewDao {
         }, keyHolder);
         int id = keyHolder.getKey().intValue();
         review.setReviewId(id);
+
+        String eventSqlQuery = "INSERT INTO events(moment, user_id, event_type, operation, entity_id) VALUES (?,?,?,?,?)";
+        jdbcTemplate.update(eventSqlQuery,
+                Timestamp.from(Instant.now()),
+                review.getUserId(),
+                "REVIEW",
+                "ADD",
+                review.getReviewId());
         return review;
     }
 
@@ -41,7 +51,17 @@ public class ReviewDaoImpl implements ReviewDao {
                 review.getIsPositive(),
                 review.getContent(),
                 review.getReviewId());
-        return getReviewById(review.getReviewId());
+        review = getReviewById(review.getReviewId());
+
+        String eventSqlQuery = "INSERT INTO events(moment,user_id,event_type,operation,entity_id) VALUES (?,?,?,?,?)";
+        jdbcTemplate.update(eventSqlQuery,
+                Timestamp.from(Instant.now()),
+                review.getUserId(),
+                "REVIEW",
+                "UPDATE",
+                review.getReviewId());
+
+        return review;
     }
 
     @Override
@@ -53,6 +73,14 @@ public class ReviewDaoImpl implements ReviewDao {
 
     @Override
     public void deleteReview(Integer id) {
+        String eventSqlQuery = "INSERT INTO events(moment,user_id,event_type,operation,entity_id) VALUES (?,?,?,?,?)";
+        jdbcTemplate.update(eventSqlQuery,
+                Timestamp.from(Instant.now()),
+                getReviewById(id).getUserId(),
+                "REVIEW",
+                "REMOVE",
+                id);
+
         String sqlQuery = "DELETE FROM reviews WHERE id = ?";
         jdbcTemplate.update(sqlQuery, id);
     }

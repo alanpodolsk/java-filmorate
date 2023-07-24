@@ -15,6 +15,8 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MPA;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -100,10 +102,26 @@ public class FilmDaoImpl implements FilmDao {
     public void addLike(Integer filmId, Integer userId) {
         String sqlQuery = "INSERT INTO likes (film_id, user_id) VALUES (?,?)";
         jdbcTemplate.update(sqlQuery, filmId, userId);
+
+        String eventSqlQuery = "INSERT INTO events(moment,user_id,event_type,operation,entity_id) VALUES (?,?,?,?,?)";
+        jdbcTemplate.update(eventSqlQuery,
+                Timestamp.from(Instant.now()),
+                userId,
+                "LIKE",
+                "ADD",
+                filmId);
     }
 
     @Override
     public void deleteLike(Integer filmId, Integer userId) {
+        String eventSqlQuery = "INSERT INTO events(moment,user_id,event_type,operation,entity_id) VALUES (?,?,?,?,?)";
+        jdbcTemplate.update(eventSqlQuery,
+                Timestamp.from(Instant.now()),
+                userId,
+                "LIKE",
+                "REMOVE",
+                filmId);
+
         String sqlQuery = "DELETE FROM likes " + "WHERE user_id = ? AND film_id = ?";
         jdbcTemplate.update(sqlQuery, userId, filmId);
     }

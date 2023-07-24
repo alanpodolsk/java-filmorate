@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
@@ -65,4 +66,8 @@ public class UserController {
         return userService.recommendFilms(id);
     }
 
+    @GetMapping("/{id}/feed")
+    public List<Event> getEventsList (@PathVariable Integer id) {
+        return userService.getEventsList(id);
+    }
 }

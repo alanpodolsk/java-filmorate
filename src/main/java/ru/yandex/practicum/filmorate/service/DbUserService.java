@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NoObjectException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.repository.FilmDao;
@@ -110,6 +111,10 @@ public class DbUserService implements UserService {
         return filmDao.getRecomendFilms(id, sameUserId.get(1));
     }
 
+    @Override
+    public List<Event> getEventsList(Integer id) {
+        return userDao.getEventsList(id);
+    }
     private User isValid(User user) {
         if (user == null) {
             throw new ValidationException("Передан пустой объект пользователя");

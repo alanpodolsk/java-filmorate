@@ -7,10 +7,14 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exception.NoObjectException;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -76,6 +80,14 @@ public class UserDaoImpl implements UserDao {
         jdbcTemplate.update(sqlQuery,
                 userId,
                 friendId);
+
+        String eventSqlQuery = "INSERT INTO events(moment,user_id,event_type,operation,entity_id) VALUES (?,?,?,?,?)";
+        jdbcTemplate.update(eventSqlQuery,
+                Timestamp.from(Instant.now()),
+                userId,
+                "FRIEND",
+                "ADD",
+                friendId);
     }
 
     @Override
@@ -84,6 +96,14 @@ public class UserDaoImpl implements UserDao {
                 "WHERE user_id = ? AND friend_id = ?";
         jdbcTemplate.update(sqlQuery,
                 userId,
+                friendId);
+
+        String eventSqlQuery = "INSERT INTO events(moment,user_id,event_type,operation,entity_id) VALUES (?,?,?,?,?)";
+        jdbcTemplate.update(eventSqlQuery,
+                Timestamp.from(Instant.now()),
+                userId,
+                "FRIEND",
+                "REMOVE",
                 friendId);
     }
 
@@ -120,6 +140,18 @@ public class UserDaoImpl implements UserDao {
 
     }
 
+    private RowMapper<Event> eventRowMapper() {
+        return (rs, rowNum) -> {
+            Event event = new Event();
+            event.setTimestamp(rs.getTimestamp("moment").getTime());
+            event.setUserId(rs.getInt("user_id"));
+            event.setEventType(rs.getString("event_type"));
+            event.setOperation(rs.getString("operation"));
+            event.setEventId(rs.getInt("event_id"));
+            event.setEntityId(rs.getInt("entity_id"));
+            return event;
+        };
+    }
     private List<Integer> getFriendsIds(Integer id) {
         return jdbcTemplate.query("SELECT friend_id From friends where user_id = ?", (rs, rowNum) -> rs.getInt("friend_id"), id);
     }
@@ -134,5 +166,14 @@ public class UserDaoImpl implements UserDao {
                                             rs.getInt("COUNT(distinct film_id)");
                                             return  rs.getInt("user_id");
                                             }, id);
+    }
+
+    @Override
+    public List<Event> getEventsList(Integer id) {
+        if(getUserById(id) == null) {
+            throw new NoObjectException("Данный пользователь не найден в базе");
+        }
+        return jdbcTemplate.query("SELECT moment, user_id, event_type, operation, event_id, entity_id " +
+                "FROM events WHERE user_id = ? ", eventRowMapper(), id);
     }
 }
