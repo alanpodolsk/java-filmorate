@@ -171,7 +171,7 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public List<Event> getEventsList(Integer id) {
-        if(getUserById(id) == null) {
+        if (getUserById(id) == null) {
             throw new NoObjectException("Данный пользователь не найден в базе");
         }
         return jdbcTemplate.query("SELECT moment, user_id, event_type, operation, event_id, entity_id " +
