@@ -24,11 +24,11 @@ public class EventDaoImpl implements EventDao {
     }
 
     @Override
-    public void addFeed(Integer user_id, String eventType, String operation, Integer entityId) {
+    public void addFeed(Integer userId, String eventType, String operation, Integer entityId) {
         String eventSqlQuery = "INSERT INTO events(moment,user_id,event_type,operation,entity_id) VALUES (?,?,?,?,?)";
         jdbcTemplate.update(eventSqlQuery,
                 Timestamp.from(Instant.now()),
-                user_id,
+                userId,
                 eventType,
                 operation,
                 entityId);

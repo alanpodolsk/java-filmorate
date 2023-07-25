@@ -7,5 +7,5 @@ public interface EventDao {
 
     List<Event> getFeedById(Integer id);
 
-    void addFeed(Integer user_id, String eventType, String operation, Integer entityId);
+    void addFeed(Integer userId, String eventType, String operation, Integer entityId);
 }
