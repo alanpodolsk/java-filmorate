@@ -106,6 +106,11 @@ public class InMemoryFilmService implements FilmService {
     }
 
     @Override
+    public List<Film> getCommonFilms(Integer userId, Integer friendId) {
+        return null;
+    }
+
+    @Override
     public List<Film> getFilmsSearch(String text, List<String> ls) {
         return null;
     }

@@ -12,6 +12,7 @@ import ru.yandex.practicum.filmorate.repository.FilmDao;
 import ru.yandex.practicum.filmorate.repository.UserDao;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
@@ -100,6 +101,20 @@ public class DbFilmService implements FilmService {
         return filmDao.getFilmsByDirector(directorId, sortBy);
     }
 
+    @Override
+    public List<Film> getCommonFilms(Integer userId, Integer friendId) {
+        if (userDao.getUserById(userId) == null) {
+            throw new NoObjectException("Данный пользователь отсутствует в базе");
+        }
+        if (userDao.getUserById(friendId) == null) {
+            throw new NoObjectException("Данный друг отсутствует в базе");
+        }
+        List<Film> films = filmDao.getCommonFilms(userId, friendId);
+        if (films == null) {
+            return new ArrayList<>();
+        }
+        return films;
+    }
 
     @Override
     public List<Film> getFilmsSearch(String text, List<String> ls) {

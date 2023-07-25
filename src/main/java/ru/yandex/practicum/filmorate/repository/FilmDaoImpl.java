@@ -188,6 +188,22 @@ public class FilmDaoImpl implements FilmDao {
         }
     }
 
+    @Override
+    public List<Film> getCommonFilms(Integer userId, Integer friendId) {
+        String sql = "select f.id, f.name , f.description , f.releasedate , f.duration , f.mpa_id, mr.name as mpa_name " +
+                " from films f left join mpa_ratings mr on mr.id = f.mpa_id left join likes l on l.film_id = f.id " +
+                "where f.id in (select distinct l.film_id from likes where l.user_id =? INTERSECT " +
+                "select distinct l.film_id  from likes l where l.user_id =?) " +
+                "GROUP BY f.id, f.name, f.description, f.releaseDate, f.duration, f.mpa_id, mr.name ORDER BY count(l.user_id) desc, f.id DESC";
+        List<Film> films = jdbcTemplate.query(sql, filmRowMapper(), userId, friendId);
+        Map<Integer, Film> filmMap = new HashMap<>();
+        for (Film film : films) {
+            filmMap.put(film.getId(), film);
+        }
+        setGenres(filmMap);
+        setDirectors(filmMap);
+        return films;
+    }
 
     private RowMapper<Film> filmRowMapper() {
         return (rs, rowNum) -> {
