@@ -19,6 +19,7 @@ import java.util.*;
 @AllArgsConstructor
 public class UserDaoImpl implements UserDao {
     private final JdbcTemplate jdbcTemplate;
+    private EventDao eventDao;
 
     @Override
     public User addUser(User user) {
@@ -76,6 +77,8 @@ public class UserDaoImpl implements UserDao {
         jdbcTemplate.update(sqlQuery,
                 userId,
                 friendId);
+
+        eventDao.addFeed(userId,"FRIEND","ADD",friendId);
     }
 
     @Override
@@ -85,6 +88,8 @@ public class UserDaoImpl implements UserDao {
         jdbcTemplate.update(sqlQuery,
                 userId,
                 friendId);
+
+        eventDao.addFeed(userId,"FRIEND","REMOVE",friendId);
     }
 
     @Override

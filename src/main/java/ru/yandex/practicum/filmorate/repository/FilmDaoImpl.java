@@ -23,6 +23,7 @@ import java.util.*;
 @AllArgsConstructor
 public class FilmDaoImpl implements FilmDao {
     private final JdbcTemplate jdbcTemplate;
+    private EventDao eventDao;
 
     @Override
     public Film addFilm(Film film) {
@@ -115,10 +116,12 @@ public class FilmDaoImpl implements FilmDao {
     public void addLike(Integer filmId, Integer userId) {
         String sqlQuery = "INSERT INTO likes (film_id, user_id) VALUES (?,?)";
         jdbcTemplate.update(sqlQuery, filmId, userId);
+        eventDao.addFeed(userId, "LIKE", "ADD", filmId);
     }
 
     @Override
     public void deleteLike(Integer filmId, Integer userId) {
+        eventDao.addFeed(userId, "LIKE", "REMOVE", filmId);
         String sqlQuery = "DELETE FROM likes " + "WHERE user_id = ? AND film_id = ?";
         jdbcTemplate.update(sqlQuery, userId, filmId);
     }

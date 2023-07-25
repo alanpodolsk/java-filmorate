@@ -5,10 +5,12 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NoObjectException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.repository.FilmDao;
 import ru.yandex.practicum.filmorate.repository.UserDao;
+import ru.yandex.practicum.filmorate.repository.EventDao;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -19,6 +21,7 @@ import java.util.*;
 public class DbUserService implements UserService {
     private UserDao userDao;
     private FilmDao filmDao;
+    private EventDao eventDao;
 
     @Override
     public User addUser(User user) {
@@ -108,6 +111,14 @@ public class DbUserService implements UserService {
             return new ArrayList<>();
         }
         return filmDao.getRecomendFilms(id, sameUserId.get(1));
+    }
+
+    @Override
+    public List<Event> getEventsList(Integer id) {
+        if (userDao.getUserById(id) == null) {
+            throw new NoObjectException("Данный пользователь не найден в базе");
+        }
+        return eventDao.getFeedById(id);
     }
 
     private User isValid(User user) {

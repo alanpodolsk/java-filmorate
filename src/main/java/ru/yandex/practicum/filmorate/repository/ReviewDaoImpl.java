@@ -15,6 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ReviewDaoImpl implements ReviewDao {
     private final JdbcTemplate jdbcTemplate;
+    private EventDao eventDao;
 
     @Override
     public Review addReview(Review review) {
@@ -31,6 +32,7 @@ public class ReviewDaoImpl implements ReviewDao {
         }, keyHolder);
         int id = keyHolder.getKey().intValue();
         review.setReviewId(id);
+        eventDao.addFeed(review.getUserId(),"REVIEW","ADD",review.getReviewId());
         return review;
     }
 
@@ -41,7 +43,9 @@ public class ReviewDaoImpl implements ReviewDao {
                 review.getIsPositive(),
                 review.getContent(),
                 review.getReviewId());
-        return getReviewById(review.getReviewId());
+        review = getReviewById(review.getReviewId());
+        eventDao.addFeed(review.getUserId(), "REVIEW", "UPDATE", review.getReviewId());
+        return review;
     }
 
     @Override
@@ -53,6 +57,7 @@ public class ReviewDaoImpl implements ReviewDao {
 
     @Override
     public void deleteReview(Integer id) {
+        eventDao.addFeed(getReviewById(id).getUserId(), "REVIEW", "REMOVE", id);
         String sqlQuery = "DELETE FROM reviews WHERE id = ?";
         jdbcTemplate.update(sqlQuery, id);
     }
