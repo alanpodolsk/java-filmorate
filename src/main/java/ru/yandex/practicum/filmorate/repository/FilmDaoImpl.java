@@ -91,6 +91,7 @@ public class FilmDaoImpl implements FilmDao {
                 + "f.releaseDate, f.duration, f.mpa_id, mpa_ratings.name as mpa_name "
                 + "from films f left join mpa_ratings on mpa_ratings.id = f.mpa_id "
                 + "WHERE f.id = ? ORDER BY f.id ASC", filmRowMapper(), filmId);
+
         if (films.size() != 1) {
             return null;
         }
