@@ -115,7 +115,7 @@ public class DbUserService implements UserService {
 
     @Override
     public List<Event> getEventsList(Integer id) {
-        if(userDao.getUserById(id) == null) {
+        if (userDao.getUserById(id) == null) {
             throw new NoObjectException("Данный пользователь не найден в базе");
         }
         return eventDao.getFeedById(id);
