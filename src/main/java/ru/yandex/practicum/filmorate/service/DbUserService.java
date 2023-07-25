@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.repository.FilmDao;
 import ru.yandex.practicum.filmorate.repository.UserDao;
+import ru.yandex.practicum.filmorate.repository.EventDao;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -20,6 +21,7 @@ import java.util.*;
 public class DbUserService implements UserService {
     private UserDao userDao;
     private FilmDao filmDao;
+    private EventDao eventDao;
 
     @Override
     public User addUser(User user) {
@@ -113,8 +115,12 @@ public class DbUserService implements UserService {
 
     @Override
     public List<Event> getEventsList(Integer id) {
-        return userDao.getEventsList(id);
+        if(userDao.getUserById(id) == null) {
+            throw new NoObjectException("Данный пользователь не найден в базе");
+        }
+        return eventDao.getFeedById(id);
     }
+
     private User isValid(User user) {
         if (user == null) {
             throw new ValidationException("Передан пустой объект пользователя");
