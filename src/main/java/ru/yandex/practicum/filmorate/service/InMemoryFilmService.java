@@ -26,6 +26,10 @@ public class InMemoryFilmService implements FilmService {
     }
 
     @Override
+    public void deleteFilm(Integer filmId) {
+    }
+
+    @Override
     public Film updateFilm(Film film) {
         isValid(film);
         if (film.getId() == null || filmStorage.getFilm(film.getId()) == null) {
@@ -77,7 +81,7 @@ public class InMemoryFilmService implements FilmService {
     }
 
     @Override
-    public List<Film> getPopularFilms(Integer count) {
+    public List<Film> getPopularFilms(Integer count, Integer genreId, Integer year) {
         List<Film> films = filmStorage.getAllFilms();
         return films.stream().sorted((p0, p1) -> {
                     int comp = -1 * Integer.valueOf(p0.getLikes().size()).compareTo(p1.getLikes().size());
@@ -94,6 +98,21 @@ public class InMemoryFilmService implements FilmService {
         } else {
             throw new NoObjectException("Фильм с id=" + id + "не найден");
         }
+    }
+
+    @Override
+    public List<Film> getFilmsByDirector(Integer directorId, String sortBy) {
+        return null;
+    }
+
+    @Override
+    public List<Film> getCommonFilms(Integer userId, Integer friendId) {
+        return null;
+    }
+
+    @Override
+    public List<Film> getFilmsSearch(String text, List<String> ls) {
+        return null;
     }
 
     private Film isValid(Film film) {

@@ -5,11 +5,14 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NoObjectException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.repository.DirectorDao;
 import ru.yandex.practicum.filmorate.repository.FilmDao;
 import ru.yandex.practicum.filmorate.repository.UserDao;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
@@ -19,11 +22,19 @@ import java.util.List;
 public class DbFilmService implements FilmService {
     private FilmDao filmDao;
     private UserDao userDao;
+    private DirectorDao directorDao;
 
     @Override
     public Film addFilm(Film film) {
         isValid(film);
         return filmDao.getFilmById(filmDao.addFilm(film).getId());
+    }
+
+    @Override
+    public void deleteFilm(Integer filmId) {
+        if (filmId > 0 || filmDao.getFilmById(filmId) != null) {
+            filmDao.deleteFilm(filmId);
+        }
     }
 
     @Override
@@ -67,8 +78,8 @@ public class DbFilmService implements FilmService {
     }
 
     @Override
-    public List<Film> getPopularFilms(Integer count) {
-        return filmDao.getPopularFilms(count);
+    public List<Film> getPopularFilms(Integer count, Integer genreId, Integer year) {
+        return filmDao.getPopularFilms(count, genreId, year);
     }
 
     @Override
@@ -79,6 +90,35 @@ public class DbFilmService implements FilmService {
         } else {
             return film;
         }
+    }
+
+    public List<Film> getFilmsByDirector(Integer directorId, String sortBy) {
+        Director director = directorDao.getDirectorById(directorId);
+        if (director == null) {
+            throw new NoObjectException("Режиссер с id = " + directorId + "не найден в базе");
+        }
+
+        return filmDao.getFilmsByDirector(directorId, sortBy);
+    }
+
+    @Override
+    public List<Film> getCommonFilms(Integer userId, Integer friendId) {
+        if (userDao.getUserById(userId) == null) {
+            throw new NoObjectException("Данный пользователь отсутствует в базе");
+        }
+        if (userDao.getUserById(friendId) == null) {
+            throw new NoObjectException("Данный друг отсутствует в базе");
+        }
+        List<Film> films = filmDao.getCommonFilms(userId, friendId);
+        if (films == null) {
+            return new ArrayList<>();
+        }
+        return films;
+    }
+
+    @Override
+    public List<Film> getFilmsSearch(String text, List<String> ls) {
+        return filmDao.getFilmsSearch(text, ls);
     }
 
     private Film isValid(Film film) {
