@@ -234,7 +234,7 @@ class FilmorateApplicationTests {
         filmDao.addLike(1, 2);
         filmDao.addLike(1, 1);
         //Assert
-        assertArrayEquals(new Film[]{filmDao.getFilmById(2), filmDao.getFilmById(1)}, filmDao.getPopularFilms(10).toArray(), "Возвращен некорректный список популярных фильмов");
+        assertArrayEquals(new Film[]{filmDao.getFilmById(2), filmDao.getFilmById(1)}, filmDao.getPopularFilms(10, null, null).toArray(), "Возвращен некорректный список популярных фильмов");
     }
 
     @Test
